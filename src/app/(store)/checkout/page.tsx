@@ -7,6 +7,7 @@ import { ChevronRight, Shield, Lock } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { openRazorpayCheckout } from "@/lib/razorpay/client";
 
 type Step = "address" | "review" | "payment";
 
@@ -74,12 +75,81 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async () => {
     setLoading(true);
-    // TODO: wire to /api/payments/create-order + Razorpay
-    await new Promise((r) => setTimeout(r, 1200));
-    toast.success("Order placed! (Payment integration coming soon)");
-    clearCart();
-    router.push("/orders");
-    setLoading(false);
+    try {
+      // 1. Create order on Razorpay
+      const res = await fetch("/api/payments/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: grandTotal }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Failed to create order on payment gateway");
+      }
+      
+      const razorpayOrder = data.data;
+      
+      // 2. Open Razorpay checkout
+      await openRazorpayCheckout({
+        orderId: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: "Daddy Prince",
+        description: "Collector Acquisition Payment",
+        prefill: {
+          name: address.full_name,
+          contact: address.phone,
+        },
+        onSuccess: async (paymentId, orderId, signature) => {
+          setLoading(true);
+          try {
+            toast.loading("Verifying payment...", { id: "payment-verify" });
+            const verifyRes = await fetch("/api/payments/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: orderId,
+                razorpay_payment_id: paymentId,
+                razorpay_signature: signature,
+                items: items.map((item) => ({
+                  product_id: item.product.id,
+                  product_name: item.product.name,
+                  quantity: item.quantity,
+                  price: item.product.price,
+                  product_image: item.product.images[0] || "",
+                })),
+                shipping_address: address,
+                subtotal: totalPrice(),
+                shipping,
+                total: grandTotal,
+              }),
+            });
+            
+            const verifyData = await verifyRes.json();
+            if (!verifyRes.ok || verifyData.error) {
+              throw new Error(verifyData.error || "Payment verification failed");
+            }
+            
+            toast.success("Payment verified! Order placed successfully.", { id: "payment-verify" });
+            clearCart();
+            router.push(`/checkout/success?id=${verifyData.order_id}`);
+          } catch (err: any) {
+            toast.error(err.message || "Payment verification failed", { id: "payment-verify" });
+          } finally {
+            setLoading(false);
+          }
+        },
+        onFailure: (err) => {
+          console.error("Razorpay payment failed:", err);
+          toast.error("Payment was cancelled or failed. Please try again.");
+          setLoading(false);
+        },
+      });
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong. Please try again.");
+      setLoading(false);
+    }
   };
 
   const field = (

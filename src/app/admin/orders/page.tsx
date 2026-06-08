@@ -36,18 +36,14 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient() as any;
-
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const { data, error: fetchError } = await supabase
-        .from("orders")
-        .select("*, profiles(email)")
-        .order("created_at", { ascending: false });
+      const res = await fetch("/api/admin/orders");
+      const data = await res.json();
 
-      if (fetchError) throw fetchError;
-      setOrders(data || []);
+      if (!res.ok || data.error) throw new Error(data.error || "Failed to load orders");
+      setOrders(data.data || []);
     } catch (err: any) {
       setError(err.message || "Failed to load orders");
       toast.error("Error loading orders");
@@ -77,12 +73,14 @@ export default function AdminOrders() {
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
-      const { error: updateError } = await supabase
-        .from("orders")
-        .update({ status: newStatus, updated_at: new Date().toISOString() })
-        .eq("id", id);
+      const res = await fetch("/api/admin/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+      const data = await res.json();
 
-      if (updateError) throw updateError;
+      if (!res.ok || data.error) throw new Error(data.error || "Failed to update order status");
 
       setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: newStatus } : o)));
       toast.success(`Order status updated to ${newStatus}`);

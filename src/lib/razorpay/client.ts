@@ -55,6 +55,11 @@ export async function openRazorpayCheckout(opts: RazorpayOptions) {
         response.razorpay_signature
       );
     },
+    modal: {
+      ondismiss: () => {
+        opts.onFailure(new Error("Payment window closed"));
+      },
+    },
   });
 
   rzp.open();
