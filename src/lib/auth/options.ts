@@ -1,4 +1,5 @@
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { NextAuthOptions } from "next-auth";
 import crypto from "crypto";
@@ -18,6 +19,78 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    CredentialsProvider({
+      name: "Phone OTP",
+      credentials: {
+        phone: { label: "Phone Number", type: "text" },
+        otp: { label: "One-Time Password", type: "text" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.phone || !credentials?.otp) {
+          throw new Error("Phone number and OTP are required");
+        }
+
+        const { phone, otp } = credentials;
+        const supabase = createAdminClient() as any;
+
+        // 1. Verify OTP with Supabase
+        const { data, error } = await supabase.auth.verifyOtp({
+          phone,
+          token: otp,
+          type: "sms",
+        });
+
+        if (error || !data.user) {
+          throw new Error(error?.message || "Invalid or expired OTP");
+        }
+
+        const user = data.user;
+
+        // 2. Sync profile in public.profiles
+        const dummyEmail = `${phone.replace(/[^\d]/g, "")}@phone.daddyprince.com`;
+
+        // Check if profile exists
+        const { data: existingProfile, error: fetchErr } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (fetchErr) {
+          console.error("Error checking user profile:", fetchErr);
+          throw new Error("Authentication database error");
+        }
+
+        if (!existingProfile) {
+          const { error: insertErr } = await supabase
+            .from("profiles")
+            .insert({
+              id: user.id,
+              email: dummyEmail,
+              full_name: `Patron ${phone}`,
+              phone: phone,
+              role: "customer",
+            });
+
+          if (insertErr) {
+            console.error("Error creating user profile:", insertErr);
+            throw new Error("Failed to initialize user account");
+          }
+        } else {
+          // Update phone number if it wasn't populated
+          await supabase
+            .from("profiles")
+            .update({ phone, updated_at: new Date().toISOString() })
+            .eq("id", user.id);
+        }
+
+        return {
+          id: user.id,
+          email: dummyEmail,
+          name: `Patron ${phone}`,
+        };
+      },
     }),
   ],
   session: {

@@ -1,43 +1,62 @@
 "use client";
 
+import { useTheme } from "@/components/layout/ThemeProvider";
+import { useEffect, useState } from "react";
+
 const items = [
-  "Authenticated Heritage Pieces",
+  "Curated Masterpieces",
   "Ships Worldwide",
   "Handpicked by Experts",
   "Direct from Artisan Families",
-  "Est. 2024",
+  "Est. 1984",
   "100% Genuine Craftsmanship",
   "Insured Delivery",
   "Certified Origins",
-  "10,000+ Happy Collectors",
+  "Heritage Since 1984",
 ];
 
 export default function MarqueeTicker() {
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const repeated = [...items, ...items];
+  const isLight = mounted && theme === "light";
+
   return (
     <div
       className="overflow-hidden py-3 select-none relative"
       style={{
-        borderTop: "1px solid var(--border)",
-        borderBottom: "1px solid var(--border)",
-        background: "linear-gradient(90deg, var(--bg-card), var(--bg-subtle), var(--bg-card))",
+        borderTop: isLight ? "1px solid rgba(199, 154, 59, 0.2)" : "1px solid var(--border)",
+        borderBottom: isLight ? "1px solid rgba(199, 154, 59, 0.2)" : "1px solid var(--border)",
+        background: isLight 
+          ? "#5B1C1C" 
+          : "linear-gradient(90deg, var(--bg-card), var(--bg-subtle), var(--bg-card))",
       }}
     >
       {/* Fade edges */}
-      <div className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
-        style={{ background: "linear-gradient(90deg, var(--bg), transparent)" }} />
-      <div className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
-        style={{ background: "linear-gradient(-90deg, var(--bg), transparent)" }} />
+      <div 
+        className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+        style={{ 
+          background: `linear-gradient(90deg, ${isLight ? "#5B1C1C" : "var(--bg)"}, transparent)` 
+        }} 
+      />
+      <div 
+        className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+        style={{ 
+          background: `linear-gradient(-90deg, ${isLight ? "#5B1C1C" : "var(--bg)"}, transparent)` 
+        }} 
+      />
 
       <div className="flex gap-0 animate-marquee whitespace-nowrap">
         {repeated.map((item, i) => (
           <span
             key={i}
             className="flex items-center gap-5 font-body text-[10px] tracking-[0.25em] uppercase px-5"
-            style={{ color: "var(--text-muted)" }}
+            style={{ color: isLight ? "#F5EFE4" : "var(--text-muted)" }}
           >
             {item}
-            <span style={{ color: "var(--gold)", fontSize: "5px", opacity: 0.8 }}>◆</span>
+            <span style={{ color: isLight ? "#C79A3B" : "var(--gold)", fontSize: "5px", opacity: 0.8 }}>◆</span>
           </span>
         ))}
       </div>

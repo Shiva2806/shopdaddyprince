@@ -5,7 +5,7 @@ import { createServerClient } from "@/lib/supabase/server";
 
 interface Props {
   params: { category: string };
-  searchParams: { sub?: string; sort?: string; page?: string };
+  searchParams: { sub?: string; sort?: string; page?: string; state?: string; tag?: string };
 }
 
 export const revalidate = 0; // Bypass cache to fetch fresh data
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props) {
   if (!cat) return {};
   return {
     title: `${cat.label} | Daddy Prince`,
-    description: `Shop our curated collection of ${cat.label.toLowerCase()} — authentic heritage Indian crafts.`,
+    description: `Shop our curated collection of ${cat.label.toLowerCase()} — authentic, handpicked Indian crafts.`,
   };
 }
 
@@ -59,6 +59,7 @@ export default async function ShopPage({ params, searchParams }: Props) {
     dimensions: (p.dimensions as any)?.text || "",
     medium: (p.dimensions as any)?.medium || "",
     year: (p.dimensions as any)?.year || "",
+    tags: p.tags || [],
   }));
 
   return (
@@ -66,6 +67,8 @@ export default async function ShopPage({ params, searchParams }: Props) {
       category={category}
       initialProducts={products}
       activeSub={searchParams.sub}
+      activeState={searchParams.state}
+      activeTag={searchParams.tag}
       activeSort={searchParams.sort ?? "newest"}
     />
   );

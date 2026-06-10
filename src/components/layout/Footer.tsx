@@ -2,28 +2,49 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-gold/10 bg-ink mt-8 md:mt-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 md:pt-14">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+    <footer className="relative border-t border-gold/15 bg-ink overflow-hidden min-h-[500px] flex flex-col justify-between">
+      
+      {/* Cinematic Background Image */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-[10000ms] hover:scale-105"
+        style={{
+          backgroundImage: 'url("/images/categories/footer.webp")',
+        }}
+      />
+      
+      {/* Dark Overlay for text legibility */}
+      <div 
+        className="absolute inset-0 z-10 bg-black/65 pointer-events-none"
+      />
 
-          {/* Brand */}
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-3 mb-3">
+      {/* Footer Content */}
+      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 w-full flex-1 flex flex-col justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-10 pb-12 border-b border-gold/10">
+
+          {/* Brand Column (Left) */}
+          <div className="col-span-1">
+            <div className="flex items-center gap-4 mb-4">
               <img
                 src="/favicon.ico"
                 alt="Daddy Prince Logo"
-                className="w-8 h-8 object-contain"
+                className="w-12 h-12 object-contain"
               />
-              <p className="font-display text-3xl text-gold tracking-widest uppercase">
+              <p className="font-display text-4xl text-gold tracking-widest uppercase">
                 Daddy Prince
               </p>
             </div>
-            <p className="mt-3 text-cream/50 font-body text-sm leading-relaxed max-w-xs">
-              Curating the finest heritage Indian arts and artifacts for
-              collectors and connoisseurs worldwide.
-            </p>
+            
+            <div className="mt-4 text-cream/80 font-body text-[13px] leading-relaxed max-w-[300px]">
+              <p className="italic">
+                Established in 1984 by <span className="text-gold font-medium">Prince Satyam</span>.
+              </p>
+              <p className="mt-2 text-cream/40 text-[11px] uppercase tracking-widest leading-loose">
+                Continuing a Legacy of Art, Heritage, and Timeless Craftsmanship.
+              </p>
+            </div>
+            
             {/* Social Links */}
-            <div className="mt-6 flex items-center gap-4 text-cream/40">
+            <div className="mt-6 flex items-center gap-4 text-cream/50">
               <a
                 href="https://www.instagram.com/daddyprince.official/"
                 target="_blank"
@@ -71,7 +92,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://wa.me/910000000000"
+                href="https://wa.me/916301206401"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Chat with Daddy Prince on WhatsApp"
@@ -84,15 +105,15 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Shop links */}
+          {/* Shop Column (Center-Left) */}
           <div>
-            <p className="font-body text-xs tracking-widest uppercase text-gold/60 mb-4">Shop</p>
-            <ul className="space-y-2 text-sm text-cream/50 font-body">
+            <p className="font-body text-xs tracking-widest uppercase text-gold/80 mb-4">Shop</p>
+            <ul className="space-y-2 text-sm text-cream/70 font-body">
               {["Paintings", "Sculptures", "Textiles", "Jewelry", "Artifacts"].map((c) => (
                 <li key={c}>
                   <Link
                     href={`/shop?category=${c.toLowerCase()}`}
-                    className="hover:text-gold transition-colors"
+                    className="hover:text-gold transition-colors font-light"
                   >
                     {c}
                   </Link>
@@ -101,31 +122,77 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Help links */}
+          {/* Customer Care Column (Center) */}
           <div>
-            <p className="font-body text-xs tracking-widest uppercase text-gold/60 mb-4">Help</p>
-            <ul className="space-y-2 text-sm text-cream/50 font-body">
+            <p className="font-body text-xs tracking-widest uppercase text-gold/80 mb-4">Customer Care</p>
+            <ul className="space-y-2 text-sm text-cream/70 font-body">
               {[
-                { label: "About Us", href: "/about" },
-                { label: "Shipping", href: "/shipping" },
-                { label: "Returns", href: "/returns" },
-                { label: "Contact", href: "/contact" },
+                { label: "Track Order", href: "/track-order" },
+                { label: "Shipping Policy", href: "/shipping-policy" },
+                { label: "Return Policy", href: "/return-policy" },
+                { label: "FAQ", href: "/faq" },
               ].map((l) => (
                 <li key={l.label}>
-                  <Link href={l.href} className="hover:text-gold transition-colors">
+                  <Link href={l.href} className="hover:text-gold transition-colors font-light">
                     {l.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
+
+          {/* Company Column (Center-Right) */}
+          <div>
+            <p className="font-body text-xs tracking-widest uppercase text-gold/80 mb-4">Company</p>
+            <ul className="space-y-2 text-sm text-cream/70 font-body">
+              {[
+                { label: "About Us", href: "/about" },
+                { label: "Privacy Policy", href: "/privacy-policy" },
+                { label: "Terms & Conditions", href: "/terms-and-conditions" },
+                { label: "Contact", href: "/contact" },
+              ].map((l) => (
+                <li key={l.label}>
+                  <Link href={l.href} className="hover:text-gold transition-colors font-light">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Boutique Residence (Right Column) */}
+          <div className="col-span-1">
+            <p className="font-body text-xs tracking-widest uppercase text-gold/80 mb-4">Boutique & Gallery</p>
+            <div className="text-sm text-cream/70 font-body leading-relaxed space-y-2 font-light">
+              <p className="font-medium text-cream font-display tracking-wide">Daddy Prince</p>
+              <p>Shop No. 20, Guptas Midtown</p>
+              <p>Beside Chennai Shopping Mall</p>
+              <p>Ongole, Andhra Pradesh 523001</p>
+              <p className="pt-2">
+                <a
+                  href="https://www.google.com/maps/search/daddyprince/@15.5169276,80.0473075,21z"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-gold hover:underline font-normal"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  Get Directions
+                </a>
+              </p>
+            </div>
+          </div>
+
         </div>
 
-        <div className="mt-12 pt-6 border-t border-gold/10 flex flex-col md:flex-row items-center justify-between gap-4 text-cream/30 font-body text-xs tracking-wider">
+        {/* Footer Bottom (Copyrights / Policy links) */}
+        <div className="mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-cream/30 font-body text-xs tracking-wider">
           <p>© {new Date().getFullYear()} Daddy Prince. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="/privacy" className="hover:text-gold transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-gold transition-colors">Terms</Link>
+            <Link href="/privacy-policy" className="hover:text-gold transition-colors">Privacy Policy</Link>
+            <Link href="/terms-and-conditions" className="hover:text-gold transition-colors">Terms & Conditions</Link>
           </div>
         </div>
       </div>

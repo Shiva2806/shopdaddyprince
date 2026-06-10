@@ -100,5 +100,23 @@ export default async function ProductPage({ params }: Props) {
     year: (prod.dimensions as any)?.year || "",
   }));
 
-  return <ProductClient product={mappedProduct} related={related} />;
+  // Fetch variants for this product
+  const { data: dbVariants } = await supabase
+    .from("product_variants")
+    .select("*")
+    .eq("product_id", p.id)
+    .order("created_at", { ascending: true });
+
+  const variants = ((dbVariants as any) || []).map((v: any) => ({
+    id: v.id,
+    product_id: v.product_id,
+    dimension: v.dimension,
+    price: v.price,
+    sale_price: v.sale_price || undefined,
+    stock: v.stock,
+    sku: v.sku || undefined,
+    weight_grams: v.weight_grams || undefined,
+  }));
+
+  return <ProductClient product={mappedProduct} related={related} variants={variants} />;
 }

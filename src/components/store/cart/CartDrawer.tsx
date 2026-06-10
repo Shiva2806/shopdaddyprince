@@ -99,7 +99,7 @@ export default function CartDrawer({ open, onClose }: Props) {
                 Your cart is empty
               </p>
               <p className="font-body text-sm" style={{ color: "var(--text-faint)" }}>
-                Discover our curated collection of heritage Indian arts.
+                Discover our curated collection of fine Indian arts.
               </p>
             </div>
             <button onClick={onClose}>
@@ -112,9 +112,9 @@ export default function CartDrawer({ open, onClose }: Props) {
           <>
             {/* Items */}
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
-              {items.map(({ product: p, quantity }) => (
+              {items.map(({ product: p, quantity, variantId, selectedDimension, priceAtPurchase }) => (
                 <div
-                  key={p.id}
+                  key={`${p.id}-${variantId || ""}`}
                   className="flex gap-4 pb-5"
                   style={{ borderBottom: "1px solid var(--border)" }}
                 >
@@ -142,9 +142,17 @@ export default function CartDrawer({ open, onClose }: Props) {
                         {p.name}
                       </h3>
                     </Link>
-                    <p className="font-body text-[10px] mb-3" style={{ color: "var(--text-faint)" }}>
+                    <p className="font-body text-[10px] mb-1.5" style={{ color: "var(--text-faint)" }}>
                       {p.artist} · {p.origin}
                     </p>
+                    {selectedDimension && (
+                      <div className="mb-2">
+                        <span className="inline-block font-body text-[9px] tracking-wider uppercase px-2 py-0.5"
+                          style={{ border: "1px solid var(--border)", color: "var(--gold)", backgroundColor: "var(--gold-glow)" }}>
+                          Size: {selectedDimension}
+                        </span>
+                      </div>
+                    )}
 
                     <div className="flex items-center justify-between">
                       {/* Qty controls */}
@@ -153,7 +161,7 @@ export default function CartDrawer({ open, onClose }: Props) {
                         style={{ border: "1px solid var(--border)" }}
                       >
                         <button
-                          onClick={() => updateQuantity(p.id, quantity - 1)}
+                          onClick={() => updateQuantity(p.id, quantity - 1, variantId)}
                           className="w-7 h-7 flex items-center justify-center transition-colors"
                           style={{ color: "var(--text-muted)" }}
                           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold)")}
@@ -168,7 +176,7 @@ export default function CartDrawer({ open, onClose }: Props) {
                           {quantity}
                         </span>
                         <button
-                          onClick={() => updateQuantity(p.id, quantity + 1)}
+                          onClick={() => updateQuantity(p.id, quantity + 1, variantId)}
                           className="w-7 h-7 flex items-center justify-center transition-colors"
                           style={{ color: "var(--text-muted)" }}
                           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold)")}
@@ -180,10 +188,10 @@ export default function CartDrawer({ open, onClose }: Props) {
 
                       <div className="flex items-center gap-3">
                         <p className="font-body text-sm font-medium" style={{ color: "var(--gold)" }}>
-                          {formatPrice(p.price * quantity)}
+                          {formatPrice((priceAtPurchase ?? p.price) * quantity)}
                         </p>
                         <button
-                          onClick={() => removeItem(p.id)}
+                          onClick={() => removeItem(p.id, variantId)}
                           className="transition-colors"
                           style={{ color: "var(--text-faint)" }}
                           onMouseEnter={(e) => (e.currentTarget.style.color = "#E05030")}

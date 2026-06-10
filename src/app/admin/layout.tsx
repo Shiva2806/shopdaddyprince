@@ -9,26 +9,40 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  let session = await getServerSession(authOptions);
+  const bypass = process.env.NODE_ENV === "development" && process.env.BYPASS_ADMIN_AUTH === "true";
+
+  if (bypass) {
+    session = {
+      user: {
+        id: "00000000-0000-0000-0000-000000000000",
+        name: "Dev Admin",
+        email: "admin@shopdaddyprince.com"
+      },
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    };
+  }
 
   if (!session || !session.user?.id) {
     redirect("/login");
   }
 
-  // Verify role is 'admin' from profiles table
-  const supabase = createAdminClient() as any;
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", session.user.id)
-    .maybeSingle();
+  if (!bypass) {
+    // Verify role is 'admin' from profiles table
+    const supabase = createAdminClient() as any;
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .maybeSingle();
 
-  if (error || !profile || profile.role !== "admin") {
-    redirect("/");
+    if (error || !profile || profile.role !== "admin") {
+      redirect("/");
+    }
   }
 
   return (
-    <div className="min-h-screen flex bg-ink">
+    <div className="min-h-screen flex bg-theme">
       <AdminSidebar />
       <main className="flex-1 overflow-auto">{children}</main>
     </div>

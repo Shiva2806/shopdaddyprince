@@ -54,7 +54,7 @@ export default function CheckoutPage() {
   // Redirect if cart empty
   if (items.length === 0) {
     return (
-      <div className="min-h-screen pt-16 flex items-center justify-center" style={{ backgroundColor: "var(--bg)" }}>
+      <div className="min-h-screen pt-20 flex items-center justify-center" style={{ backgroundColor: "var(--bg)" }}>
         <div className="text-center">
           <h1 className="font-display text-4xl mb-4" style={{ color: "var(--text)" }}>Your cart is empty</h1>
           <Link href="/shop" className="btn-gold">Continue Shopping</Link>
@@ -116,8 +116,10 @@ export default function CheckoutPage() {
                   product_id: item.product.id,
                   product_name: item.product.name,
                   quantity: item.quantity,
-                  price: item.product.price,
+                  price: item.priceAtPurchase ?? item.product.price,
                   product_image: item.product.images[0] || "",
+                  variant_id: item.variantId,
+                  selected_dimension: item.selectedDimension,
                 })),
                 shipping_address: address,
                 subtotal: totalPrice(),
@@ -188,7 +190,7 @@ export default function CheckoutPage() {
   );
 
   return (
-    <div className="min-h-screen pt-16" style={{ backgroundColor: "var(--bg)" }}>
+    <div className="min-h-screen pt-20" style={{ backgroundColor: "var(--bg)" }}>
       <div className="max-w-6xl mx-auto px-6 lg:px-12 py-12">
 
         {/* Header */}
@@ -318,17 +320,20 @@ export default function CheckoutPage() {
 
                 {/* Items */}
                 <div className="space-y-4 mb-8">
-                  {items.map(({ product: p, quantity }) => (
-                    <div key={p.id} className="flex gap-4 items-center pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
+                  {items.map(({ product: p, quantity, variantId, selectedDimension, priceAtPurchase }) => (
+                    <div key={`${p.id}-${variantId || ""}`} className="flex gap-4 items-center pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
                       <div className="w-16 h-20 shrink-0 overflow-hidden" style={{ border: "1px solid var(--border)" }}>
                         <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1">
                         <p className="font-display text-lg" style={{ color: "var(--text)" }}>{p.name}</p>
+                        {selectedDimension && (
+                          <p className="font-body text-[10px] uppercase mt-0.5" style={{ color: "var(--gold)" }}>Size: {selectedDimension}</p>
+                        )}
                         <p className="font-body text-xs mt-0.5" style={{ color: "var(--text-faint)" }}>Qty: {quantity}</p>
                       </div>
                       <p className="font-body text-sm font-medium" style={{ color: "var(--gold)" }}>
-                        {formatPrice(p.price * quantity)}
+                        {formatPrice((priceAtPurchase ?? p.price) * quantity)}
                       </p>
                     </div>
                   ))}
@@ -408,8 +413,8 @@ export default function CheckoutPage() {
 
               {/* Mini item list */}
               <div className="space-y-3 mb-5">
-                {items.map(({ product: p, quantity }) => (
-                  <div key={p.id} className="flex items-center gap-3">
+                {items.map(({ product: p, quantity, variantId, selectedDimension, priceAtPurchase }) => (
+                  <div key={`${p.id}-${variantId || ""}`} className="flex items-center gap-3">
                     <div className="relative w-10 h-12 shrink-0 overflow-hidden" style={{ border: "1px solid var(--border)" }}>
                       <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
                       <span
@@ -421,9 +426,12 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-body text-xs truncate" style={{ color: "var(--text-muted)" }}>{p.name}</p>
+                      {selectedDimension && (
+                        <p className="font-body text-[9px] uppercase tracking-wide" style={{ color: "var(--gold)" }}>{selectedDimension}</p>
+                      )}
                     </div>
                     <p className="font-body text-xs shrink-0" style={{ color: "var(--text)" }}>
-                      {formatPrice(p.price * quantity)}
+                      {formatPrice((priceAtPurchase ?? p.price) * quantity)}
                     </p>
                   </div>
                 ))}

@@ -4,9 +4,15 @@ import type { CartItem, Product } from "@/types";
 
 interface CartStore {
   items: CartItem[];
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (
+    product: Product,
+    quantity?: number,
+    variantId?: string,
+    selectedDimension?: string,
+    priceAtPurchase?: number
+  ) => void;
+  removeItem: (productId: string, variantId?: string) => void;
+  updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
   totalItems: () => number;
   totalPrice: () => number;
@@ -17,35 +23,50 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
 
-      addItem: (product, quantity = 1) => {
+      addItem: (product, quantity = 1, variantId, selectedDimension, priceAtPurchase) => {
         set((state) => {
           const existing = state.items.find(
-            (i) => i.product.id === product.id
+            (i) => i.product.id === product.id && i.variantId === variantId
           );
           if (existing) {
             return {
               items: state.items.map((i) =>
-                i.product.id === product.id
+                i.product.id === product.id && i.variantId === variantId
                   ? { ...i, quantity: i.quantity + quantity }
                   : i
               ),
             };
           }
-          return { items: [...state.items, { product, quantity }] };
+          return {
+            items: [
+              ...state.items,
+              {
+                product,
+                quantity,
+                variantId,
+                selectedDimension,
+                priceAtPurchase,
+              },
+            ],
+          };
         });
       },
 
-      removeItem: (productId) => {
+      removeItem: (productId, variantId) => {
         set((state) => ({
-          items: state.items.filter((i) => i.product.id !== productId),
+          items: state.items.filter(
+            (i) => !(i.product.id === productId && i.variantId === variantId)
+          ),
         }));
       },
 
-      updateQuantity: (productId, quantity) => {
-        if (quantity < 1) return get().removeItem(productId);
+      updateQuantity: (productId, quantity, variantId) => {
+        if (quantity < 1) return get().removeItem(productId, variantId);
         set((state) => ({
           items: state.items.map((i) =>
-            i.product.id === productId ? { ...i, quantity } : i
+            i.product.id === productId && i.variantId === variantId
+              ? { ...i, quantity }
+              : i
           ),
         }));
       },
@@ -57,7 +78,7 @@ export const useCartStore = create<CartStore>()(
 
       totalPrice: () =>
         get().items.reduce(
-          (sum, i) => sum + i.product.price * i.quantity,
+          (sum, i) => sum + (i.priceAtPurchase ?? i.product.price) * i.quantity,
           0
         ),
     }),

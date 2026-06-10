@@ -16,6 +16,8 @@ const schema = z.object({
       quantity: z.number().int().positive(),
       price: z.number().int().positive(),
       product_image: z.string().optional(),
+      variant_id: z.string().optional(),
+      selected_dimension: z.string().optional(),
     })
   ),
   shipping_address: z.object({
@@ -102,20 +104,35 @@ export async function POST(request: Request) {
   // 4. Reduce stock in database
   for (const item of items) {
     try {
-      const { data: product } = await supabase
-        .from("products")
-        .select("stock")
-        .eq("id", item.product_id)
-        .single();
-      if (product) {
-        const newStock = Math.max(0, product.stock - item.quantity);
-        await supabase
+      if (item.variant_id) {
+        const { data: variant } = await supabase
+          .from("product_variants")
+          .select("stock")
+          .eq("id", item.variant_id)
+          .single();
+        if (variant) {
+          const newStock = Math.max(0, variant.stock - item.quantity);
+          await supabase
+            .from("product_variants")
+            .update({ stock: newStock })
+            .eq("id", item.variant_id);
+        }
+      } else {
+        const { data: product } = await supabase
           .from("products")
-          .update({ stock: newStock })
-          .eq("id", item.product_id);
+          .select("stock")
+          .eq("id", item.product_id)
+          .single();
+        if (product) {
+          const newStock = Math.max(0, product.stock - item.quantity);
+          await supabase
+            .from("products")
+            .update({ stock: newStock })
+            .eq("id", item.product_id);
+        }
       }
     } catch (err) {
-      console.error(`Failed to update stock for product ${item.product_id}:`, err);
+      console.error(`Failed to update stock for item ${item.product_id} / variant ${item.variant_id}:`, err);
     }
   }
 

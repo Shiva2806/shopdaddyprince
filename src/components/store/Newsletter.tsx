@@ -18,7 +18,7 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="relative pt-14 pb-8 md:pb-12 overflow-hidden" style={{ background: "var(--bg-newsletter)" }}>
+    <section className="relative pt-16 pb-12 md:pb-16 overflow-hidden" style={{ background: "var(--bg-newsletter)" }}>
       {/* Grain */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
@@ -40,13 +40,13 @@ export default function Newsletter() {
           <div className="w-6 h-px" style={{ backgroundColor: "var(--gold)" }} />
         </div>
 
-        <h2 className="font-display text-4xl md:text-5xl mb-4" style={{ color: "var(--text)" }}>
+        <h2 className="font-display text-4xl md:text-5xl mb-4" style={{ color: "var(--text-heading)" }}>
           Rare Pieces<br />
           <span className="text-gold-shimmer">Arrive Only Once</span>
         </h2>
 
         <p className="font-body text-sm mb-10 leading-relaxed" style={{ color: "var(--text-muted)" }}>
-          Join our circle of collectors and receive first access to heritage acquisitions,
+          Join our circle of collectors and receive first access to exclusive acquisitions,
           artisan discoveries, and curated stories from across India.
         </p>
 

@@ -57,10 +57,24 @@ export interface Product {
   updated_at: string;
 }
 
+export interface ProductVariant {
+  id: string;
+  product_id: string;
+  dimension: string;
+  price: number;
+  sale_price?: number;
+  stock: number;
+  sku?: string;
+  weight_grams?: number;
+}
+
 // ─── Cart ─────────────────────────────────────────────────────────────────────
 
 export interface CartItem {
   product: Product;
+  variantId?: string;
+  selectedDimension?: string;
+  priceAtPurchase?: number; // in paise
   quantity: number;
 }
 
@@ -75,6 +89,8 @@ export interface OrderItem {
   product_image: string;
   price: number;
   quantity: number;
+  variant_id?: string;
+  selected_dimension?: string;
 }
 
 export interface ShippingAddress {

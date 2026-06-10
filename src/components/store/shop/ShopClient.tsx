@@ -5,8 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { CATEGORIES, type ProductCategory } from "@/types";
 import ShopSidebar from "./ShopSidebar";
 import ProductGrid from "./ProductGrid";
-import ShopHeader from "./ShopHeader";
 import { SlidersHorizontal, X } from "lucide-react";
+import { getCollectionDetail } from "@/utils/collectionContent";
 
 interface UIProduct {
   id: string;
@@ -25,16 +25,26 @@ interface UIProduct {
   dimensions: string;
   medium: string;
   year: string;
+  tags: string[];
 }
 
 interface Props {
   category: ProductCategory;
   initialProducts: UIProduct[];
   activeSub?: string;
+  activeState?: string;
+  activeTag?: string;
   activeSort: string;
 }
 
-export default function ShopClient({ category, initialProducts = [], activeSub, activeSort }: Props) {
+export default function ShopClient({
+  category,
+  initialProducts = [],
+  activeSub,
+  activeState,
+  activeTag,
+  activeSort,
+}: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -47,10 +57,16 @@ export default function ShopClient({ category, initialProducts = [], activeSub, 
     if (activeSub) {
       list = list.filter((p) => p.subcategory.toLowerCase() === activeSub.toLowerCase());
     }
+    if (activeState) {
+      list = list.filter((p) => p.origin && p.origin.toLowerCase().includes(activeState.toLowerCase()));
+    }
+    if (activeTag) {
+      list = list.filter((p) => p.tags && p.tags.map((t: string) => t.toLowerCase()).includes(activeTag.toLowerCase()));
+    }
     if (activeSort === "price-asc") list = [...list].sort((a, b) => a.price - b.price);
     if (activeSort === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
     return list;
-  }, [initialProducts, activeSub, activeSort]);
+  }, [initialProducts, activeSub, activeState, activeTag, activeSort]);
 
   const setParam = (key: string, value: string | null) => {
     const params = new URLSearchParams(window.location.search);
@@ -59,17 +75,62 @@ export default function ShopClient({ category, initialProducts = [], activeSub, 
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  return (
-    <div className="min-h-screen pt-16" style={{ backgroundColor: "var(--bg)" }}>
-      {/* Page header */}
-      <ShopHeader
-        label={catInfo.label}
-        count={products.length}
-        activeSort={activeSort}
-        onSort={(val) => setParam("sort", val)}
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-      />
+  const detail = getCollectionDetail(category, activeSub);
 
+  return (
+    <div className="min-h-screen pt-20" style={{ backgroundColor: "var(--bg)" }}>
+      {/* Section 1: Editorial Collection Introduction */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 animate-fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+          {/* Large Hero Image */}
+          <div className="relative aspect-[4/3] sm:aspect-[16/10] md:aspect-[4/3] lg:aspect-[16/11] overflow-hidden rounded-lg group shadow-xl border border-[var(--border)] bg-[var(--bg-subtle)]">
+            <img
+              src={detail.image}
+              alt={detail.title}
+              className="w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+            />
+            {/* Elegant overlay shadow */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+          </div>
+
+          {/* Category Content */}
+          <div className="flex flex-col justify-center">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-px" style={{ backgroundColor: "var(--gold)" }} />
+              <span className="font-body text-[10px] tracking-[0.35em] uppercase font-semibold text-[var(--gold)]">
+                Collection
+              </span>
+            </div>
+            
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[var(--text-heading)] font-light leading-tight mb-5">
+              {detail.title}
+            </h1>
+            
+            <p className="font-body text-base leading-relaxed text-[var(--text-muted)] font-light mb-8 max-w-xl">
+              {detail.description}
+            </p>
+            
+            <div className="flex items-center gap-2 font-body text-xs tracking-wider text-[var(--text-faint)]">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "var(--gold)" }} />
+              <span>{products.length} {products.length === 1 ? "Curated Work" : "Curated Works"}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Section 2: Elegant Divider */}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="absolute inset-0 flex items-center px-4 sm:px-6 lg:px-8" aria-hidden="true">
+          <div className="w-full border-t border-[var(--border)]" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="px-5 bg-theme text-[var(--gold)] text-xs tracking-[0.5em] font-light">
+            ◆
+          </span>
+        </div>
+      </div>
+
+      {/* Section 3: Product Grid & Sidebar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         <div className="flex gap-8 mt-8">
 
@@ -108,8 +169,37 @@ export default function ShopClient({ category, initialProducts = [], activeSub, 
             </div>
           )}
 
-          {/* Product grid */}
+          {/* Product grid container */}
           <div className="flex-1 min-w-0">
+            {/* Utility bar for sorting and mobile filter */}
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-[var(--border)]">
+              <p className="font-body text-xs text-[var(--text-faint)]">
+                Showing {products.length} {products.length === 1 ? "piece" : "pieces"}
+              </p>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="lg:hidden flex items-center gap-2 px-4 py-2 font-body text-[10px] tracking-widest uppercase transition-colors glass-card"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  <SlidersHorizontal size={12} />
+                  Filter
+                </button>
+
+                <select
+                  value={activeSort}
+                  onChange={(e) => setParam("sort", e.target.value)}
+                  className="font-body text-[10px] tracking-wider uppercase px-4 py-2 focus:outline-none cursor-pointer glass-card"
+                  style={{ color: "var(--text-muted)", minWidth: "150px" }}
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="price-asc">Price: Low → High</option>
+                  <option value="price-desc">Price: High → Low</option>
+                </select>
+              </div>
+            </div>
+
             <ProductGrid products={products} />
           </div>
         </div>

@@ -1,11 +1,11 @@
 "use client";
-
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useState } from "react";
 import { formatPrice } from "@/utils/format";
 import { ShoppingBag, ArrowUpRight } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import toast from "react-hot-toast";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 interface FeaturedProduct {
   id: string;
@@ -26,30 +26,74 @@ function ProductCard({ p, handleAdd }: { p: FeaturedProduct; handleAdd: any }) {
   const displayImages = p.images && p.images.length > 0 ? p.images : [p.image];
   const hasSecondaryImage = displayImages.length > 1;
 
+  const cardRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"]
+  });
+
+  const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [lowPerformance, setLowPerformance] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    const memory = (navigator as any).deviceMemory;
+    const cores = navigator.hardwareConcurrency;
+    const isLow = (memory && memory < 4) || (cores && cores < 4);
+    setLowPerformance(isLow);
+
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const rawY = useTransform(scrollYProgress, [0, 1], [-12, 12]);
+  const rawScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.1]);
+
+  const yVal = useTransform(rawY, (v) => {
+    if (prefersReducedMotion || lowPerformance) return 0;
+    return isMobile ? v * 0.35 : v;
+  });
+
+  const scaleVal = useTransform(rawScale, (v) => {
+    if (prefersReducedMotion || lowPerformance) return 1.0;
+    return isMobile ? 1.0 + (v - 1.0) * 0.35 : v;
+  });
+
+  const y = useSpring(yVal, { stiffness: 100, damping: 25, mass: 0.5 });
+  const scale = useSpring(scaleVal, { stiffness: 100, damping: 25, mass: 0.5 });
+
   return (
     <Link
+      ref={cardRef}
       href={`/product/${p.slug}`}
       className="product-card group block glass-card overflow-hidden"
     >
       {/* Image Container */}
       <div className="relative overflow-hidden aspect-[3/4] bg-black/5">
-        {/* Primary Image (Catalog Shot) */}
-        <img
-          src={displayImages[0]}
-          alt={p.name}
-          className={`w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
-            hasSecondaryImage ? "lg:group-hover:opacity-0" : ""
-          }`}
-        />
-
-        {/* Secondary Image (Lifestyle Shot) */}
-        {hasSecondaryImage && (
+        <motion.div style={{ y, scale }} className="w-full h-full relative">
+          {/* Primary Image (Catalog Shot) */}
           <img
-            src={displayImages[1]}
-            alt={`${p.name} detail`}
-            className="absolute inset-0 w-full h-full object-cover opacity-0 lg:group-hover:opacity-100 transition-opacity duration-700 ease-in-out pointer-events-none"
+            src={displayImages[0]}
+            alt={p.name}
+            className={`w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+              hasSecondaryImage ? "lg:group-hover:opacity-0" : ""
+            }`}
           />
-        )}
+
+          {/* Secondary Image (Lifestyle Shot) */}
+          {hasSecondaryImage && (
+            <img
+              src={displayImages[1]}
+              alt={`${p.name} detail`}
+              className="absolute inset-0 w-full h-full object-cover opacity-0 lg:group-hover:opacity-100 transition-opacity duration-700 ease-in-out pointer-events-none"
+            />
+          )}
+        </motion.div>
 
         {/* Gradient Overlay */}
         <div
@@ -118,6 +162,8 @@ function ProductCard({ p, handleAdd }: { p: FeaturedProduct; handleAdd: any }) {
 
 export default function FeaturedProducts({ initialProducts = [] }: { initialProducts: FeaturedProduct[] }) {
   const addItem = useCartStore((s) => s.addItem);
+  const sectionRef = useRef<HTMLElement>(null);
+
 
   const handleAdd = (e: React.MouseEvent, p: FeaturedProduct) => {
     e.preventDefault();
@@ -146,25 +192,26 @@ export default function FeaturedProducts({ initialProducts = [] }: { initialProd
   const loopDuration = Math.max(45, Math.min(60, baseProducts.length * 4.5));
 
   return (
-    <section className="pt-12 pb-16 overflow-hidden" style={{ background: "var(--bg-featured)" }}>
+    <section ref={sectionRef} className="pt-20 pb-20 overflow-hidden" style={{ background: "var(--bg-featured)" }}>
       {/* Subtle top border line */}
       <div className="w-full h-px mb-0" style={{ background: "linear-gradient(90deg, transparent, var(--gold), transparent)" }} />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-8">
-        <div className="flex items-end justify-between mb-10 md:mb-12">
-          <div>
+        <div className="flex items-end justify-between mb-10 md:mb-12 relative overflow-visible">
+          <div className="spotlight-glow" style={{ left: "20%", width: "380px", height: "380px" }} />
+          <div className="relative z-10">
             <div className="flex items-center gap-4 mb-3">
               <div className="w-8 h-px" style={{ backgroundColor: "var(--gold)" }} />
               <p className="font-body text-[10px] tracking-[0.4em] uppercase" style={{ color: "var(--gold)" }}>
                 Handpicked
               </p>
             </div>
-            <h2 className="font-display text-5xl md:text-6xl" style={{ color: "var(--text)" }}>
+            <h2 className="font-display text-5xl md:text-6xl" style={{ color: "var(--text-heading)" }}>
               Featured<br />
               <span className="text-gold-shimmer">Works</span>
             </h2>
           </div>
-          <Link href="/shop" className="btn-ghost hidden md:inline-flex">
+          <Link href="/shop" className="btn-ghost hidden md:inline-flex relative z-10">
             View All
           </Link>
         </div>

@@ -6,6 +6,8 @@ import ProductInfo from "./ProductInfo";
 import ProductTabs from "./ProductTabs";
 import RelatedProducts from "./RelatedProducts";
 
+import type { ProductVariant } from "@/types";
+
 interface Product {
   id: string; slug: string; name: string; artist: string;
   price: number; compareAt?: number; images: string[];
@@ -17,13 +19,14 @@ interface Product {
 interface Props {
   product: Product;
   related: Product[];
+  variants?: ProductVariant[];
 }
 
-export default function ProductClient({ product, related }: Props) {
+export default function ProductClient({ product, related, variants = [] }: Props) {
   const [activeImage, setActiveImage] = useState(0);
 
   return (
-    <div className="min-h-screen pt-16" style={{ backgroundColor: "var(--bg)" }}>
+    <div className="min-h-screen pt-20" style={{ backgroundColor: "var(--bg)" }}>
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-6">
         <p className="font-body text-xs tracking-wider" style={{ color: "var(--text-faint)" }}>
@@ -46,7 +49,7 @@ export default function ProductClient({ product, related }: Props) {
             activeImage={activeImage}
             setActiveImage={setActiveImage}
           />
-          <ProductInfo product={product} />
+          <ProductInfo product={product} variants={variants} />
         </div>
 
         {/* Tabs — description, details, shipping */}

@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 const categories = [
   {
@@ -42,9 +44,11 @@ const categories = [
 ];
 
 export default function FeaturedCategories() {
+  const sectionRef = useRef<HTMLElement>(null);
+
   return (
-    <section style={{ background: "var(--bg-category)" }}>
-      <div className="pt-20 pb-12 max-w-7xl mx-auto px-6 lg:px-12">
+    <section ref={sectionRef} style={{ background: "var(--bg-category)" }}>
+      <div className="pt-24 pb-16 max-w-7xl mx-auto px-6 lg:px-12">
         {/* Section label */}
         <div className="flex items-center gap-4 mb-4">
           <div className="w-8 h-px bg-[var(--gold)]" />
@@ -52,14 +56,15 @@ export default function FeaturedCategories() {
             Curated For You
           </p>
         </div>
-        <div className="flex items-end justify-between mb-14">
-          <h2 className="font-display text-5xl md:text-6xl text-[var(--text)]">
+        <div className="flex items-end justify-between mb-14 relative overflow-visible">
+          <div className="spotlight-glow" style={{ left: "20%", width: "380px", height: "380px" }} />
+          <h2 className="font-display text-5xl md:text-6xl text-[var(--text-heading)] relative z-10">
             Shop by<br />
             <span className="text-gold-shimmer">Category</span>
           </h2>
           <Link
             href="/shop"
-            className="hidden md:flex items-center gap-2 font-body text-xs tracking-[0.2em] uppercase transition-all hover:gap-3 duration-300 text-[var(--text-muted)]"
+            className="hidden md:flex items-center gap-2 font-body text-xs tracking-[0.2em] uppercase transition-all hover:gap-3 duration-300 text-[var(--text-muted)] relative z-10"
           >
             All Collections <span className="text-[var(--gold)]">→</span>
           </Link>
@@ -104,20 +109,64 @@ function CategoryCard({
   cat: (typeof categories)[0];
   className?: string;
 }) {
+  const cardRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"],
+  });
+
+  const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [lowPerformance, setLowPerformance] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    const memory = (navigator as any).deviceMemory;
+    const cores = navigator.hardwareConcurrency;
+    const isLow = (memory && memory < 4) || (cores && cores < 4);
+    setLowPerformance(isLow);
+
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const rawY = useTransform(scrollYProgress, [0, 1], [-15, 15]);
+  const rawScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.1]);
+
+  const yVal = useTransform(rawY, (v) => {
+    if (prefersReducedMotion || lowPerformance) return 0;
+    return isMobile ? v * 0.35 : v;
+  });
+
+  const scaleVal = useTransform(rawScale, (v) => {
+    if (prefersReducedMotion || lowPerformance) return 1.0;
+    return isMobile ? 1.0 + (v - 1.0) * 0.35 : v;
+  });
+
+  const y = useSpring(yVal, { stiffness: 100, damping: 25, mass: 0.5 });
+  const scale = useSpring(scaleVal, { stiffness: 100, damping: 25, mass: 0.5 });
+
   return (
     <Link
+      ref={cardRef}
       href={`/shop/${cat.slug}`}
       className={`group category-card relative overflow-hidden block ${className}`}
     >
       {/* Image */}
-      <div className="absolute inset-0 w-full h-full">
-        <Image
-          src={cat.image}
-          alt={cat.label}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-transform duration-[850ms] ease-out group-hover:scale-105"
-        />
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
+        <motion.div style={{ y, scale }} className="w-full h-full relative">
+          <Image
+            src={cat.image}
+            alt={cat.label}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover"
+          />
+        </motion.div>
       </div>
 
       {/* Strong dark gradient overlay for text readability */}

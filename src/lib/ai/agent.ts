@@ -25,8 +25,10 @@ export async function runAgent(
   messages: AgentMessage[],
   userMessage: string
 ): Promise<string> {
+  const modelName = "claude-sonnet-4-6";
+  console.log(`Calling Anthropic API with model: ${modelName}`);
   const response = await client.messages.create({
-    model: "claude-opus-4-6",
+    model: modelName,
     max_tokens: 1024,
     system: AGENT_SYSTEM_PROMPT,
     messages: [

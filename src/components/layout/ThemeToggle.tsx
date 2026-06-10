@@ -12,44 +12,39 @@ export default function ThemeToggle() {
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
-    // Render a static placeholder with same dimensions
     return (
-      <div className="w-12 h-6 rounded-full border"
-        style={{ borderColor: "var(--border)", backgroundColor: "transparent" }}
+      <div className="w-8 h-8 rounded-full border"
+        style={{ borderColor: "rgba(212, 175, 55, 0.2)", backgroundColor: "transparent" }}
       />
     );
   }
+
+  const isDark = theme === "dark";
 
   return (
     <button
       onClick={toggle}
       aria-label="Toggle theme"
-      className="relative w-12 h-6 rounded-full border transition-all duration-300 flex items-center px-1"
-      style={{ borderColor: "var(--border-hover)", backgroundColor: "transparent" }}
+      className="w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 group focus:outline-none"
+      style={{
+        borderColor: "rgba(212, 175, 55, 0.4)",
+        backgroundColor: "transparent",
+        boxShadow: "0 0 0 transparent",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "var(--gold)";
+        e.currentTarget.style.boxShadow = "0 0 12px rgba(212, 175, 55, 0.35)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.4)";
+        e.currentTarget.style.boxShadow = "none";
+      }}
     >
-      <span
-        className={`absolute inset-0 rounded-full transition-all duration-300 ${
-          theme === "light" ? "opacity-100" : "opacity-0"
-        }`}
-        style={{ backgroundColor: "var(--gold-glow)" }}
-      />
-      <span
-        className={`relative z-10 w-4 h-4 rounded-full flex items-center justify-center
-                    transition-all duration-300 shadow-sm
-                    ${theme === "light"
-                      ? "translate-x-6"
-                      : "translate-x-0"
-                    }`}
-        style={{
-          backgroundColor: theme === "light" ? "var(--gold)" : "rgba(240,230,208,0.15)",
-          color: theme === "light" ? "#080604" : "var(--text-muted)",
-        }}
-      >
-        {theme === "light"
-          ? <Sun size={9} strokeWidth={2.5} />
-          : <Moon size={9} strokeWidth={2.5} />
-        }
-      </span>
+      {isDark ? (
+        <Sun size={14} className="text-[var(--gold)] transition-transform duration-500 rotate-0 group-hover:rotate-45" strokeWidth={1.75} />
+      ) : (
+        <Moon size={14} className="text-[var(--gold)] transition-transform duration-500 rotate-0 group-hover:-rotate-12" strokeWidth={1.75} />
+      )}
     </button>
   );
 }

@@ -64,7 +64,7 @@ export default async function SuccessPage({
           Rare Piece Secured
         </h1>
         <p className="font-body text-sm mb-8 max-w-md mx-auto" style={{ color: "var(--text-muted)" }}>
-          Thank you for your acquisition. We are preparing the secure packaging and fully insured transport of your Indian heritage piece.
+          Thank you for your acquisition. We are preparing the secure packaging and fully insured transport of your curated Indian art piece.
         </p>
 
         {/* Order Details Card */}

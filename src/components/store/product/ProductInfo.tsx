@@ -5,7 +5,7 @@ import { ShoppingBag, Heart, Shield, Truck, RotateCcw, Minus, Plus } from "lucid
 import { formatPrice } from "@/utils/format";
 import { useCartStore } from "@/store/cart";
 import toast from "react-hot-toast";
-import type { Product } from "@/types";
+import type { Product, ProductVariant } from "@/types";
 
 interface ProductData {
   id: string; slug: string; name: string; artist: string;
@@ -15,18 +15,41 @@ interface ProductData {
   dimensions: string; medium: string; year: string;
 }
 
-export default function ProductInfo({ product }: { product: ProductData }) {
+interface Props {
+  product: ProductData;
+  variants?: ProductVariant[];
+}
+
+export default function ProductInfo({ product, variants = [] }: Props) {
   const [qty, setQty] = useState(1);
   const [wishlisted, setWishlisted] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
-  const discount = product.compareAt
-    ? Math.round((1 - product.price / product.compareAt) * 100)
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
+    variants.length > 0
+      ? (variants.find((v) => v.stock > 0) || variants[0])
+      : null
+  );
+
+  const displayPrice = selectedVariant
+    ? (selectedVariant.sale_price ?? selectedVariant.price)
+    : product.price;
+
+  const displayCompareAt = selectedVariant
+    ? (selectedVariant.sale_price ? selectedVariant.price : undefined)
+    : product.compareAt;
+
+  const displayStock = selectedVariant
+    ? selectedVariant.stock
+    : product.stock;
+
+  const discount = displayCompareAt
+    ? Math.round((1 - displayPrice / displayCompareAt) * 100)
     : null;
 
   const handleAdd = () => {
-    for (let i = 0; i < qty; i++) {
-      addItem({
+    addItem(
+      {
         id: product.id,
         slug: product.slug,
         name: product.name,
@@ -42,9 +65,17 @@ export default function ProductInfo({ product }: { product: ProductData }) {
         origin: product.origin,
         created_at: "",
         updated_at: "",
-      });
-    }
-    toast.success(`${qty > 1 ? `${qty}× ` : ""}${product.name} added to cart`);
+      },
+      qty,
+      selectedVariant?.id,
+      selectedVariant?.dimension,
+      displayPrice
+    );
+    toast.success(
+      `${qty > 1 ? `${qty}× ` : ""}${product.name}${
+        selectedVariant ? ` (${selectedVariant.dimension})` : ""
+      } added to cart`
+    );
   };
 
   return (
@@ -81,12 +112,12 @@ export default function ProductInfo({ product }: { product: ProductData }) {
       {/* Price */}
       <div className="flex items-baseline gap-4 mb-8">
         <p className="font-display text-3xl text-gold-shimmer">
-          {formatPrice(product.price)}
+          {formatPrice(displayPrice)}
         </p>
-        {product.compareAt && (
+        {displayCompareAt && (
           <>
             <p className="font-body text-lg line-through" style={{ color: "var(--text-faint)" }}>
-              {formatPrice(product.compareAt)}
+              {formatPrice(displayCompareAt)}
             </p>
             <span
               className="font-body text-xs tracking-widest uppercase px-2 py-1"
@@ -102,21 +133,62 @@ export default function ProductInfo({ product }: { product: ProductData }) {
       <div className="flex items-center gap-2 mb-8">
         <div
           className="w-1.5 h-1.5 rounded-full"
-          style={{ backgroundColor: product.stock > 2 ? "#4CAF6C" : product.stock > 0 ? "#E8A030" : "#E05030" }}
+          style={{ backgroundColor: displayStock > 2 ? "#4CAF6C" : displayStock > 0 ? "#E8A030" : "#E05030" }}
         />
         <p className="font-body text-xs tracking-wide" style={{ color: "var(--text-muted)" }}>
-          {product.stock === 0
+          {displayStock === 0
             ? "Sold out"
-            : product.stock === 1
+            : displayStock === 1
             ? "Last piece available"
-            : product.stock <= 3
-            ? `Only ${product.stock} left`
+            : displayStock <= 3
+            ? `Only ${displayStock} left`
             : "In stock"}
         </p>
       </div>
 
+      {/* Size / Dimension Selector */}
+      {variants.length > 0 && (
+        <div className="mb-8">
+          <label className="block font-body text-[10px] tracking-[0.2em] uppercase mb-3" style={{ color: "var(--text-faint)" }}>
+            Select Size / Dimension
+          </label>
+          <div className="flex flex-wrap gap-2.5">
+            {variants.map((v) => {
+              const active = selectedVariant?.id === v.id;
+              const outOfStock = v.stock === 0;
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  disabled={outOfStock}
+                  onClick={() => {
+                    setSelectedVariant(v);
+                    setQty(1);
+                  }}
+                  className={`font-body text-xs px-4 py-2.5 transition-all relative ${
+                    active
+                      ? "border-gold"
+                      : "border-theme hover:border-gold-faint"
+                  } ${outOfStock ? "opacity-40 cursor-not-allowed line-through" : "cursor-pointer"}`}
+                  style={{
+                    border: "1px solid",
+                    borderColor: active
+                      ? "var(--gold)"
+                      : "var(--border)",
+                    color: active ? "var(--gold)" : "var(--text)",
+                    backgroundColor: active ? "var(--gold-glow)" : "transparent",
+                  }}
+                >
+                  {v.dimension}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Quantity + Add to cart */}
-      {product.stock > 0 && (
+      {displayStock > 0 && (
         <div className="flex gap-3 mb-6">
           {/* Qty selector */}
           <div
@@ -139,7 +211,7 @@ export default function ProductInfo({ product }: { product: ProductData }) {
               {qty}
             </span>
             <button
-              onClick={() => setQty(Math.min(product.stock, qty + 1))}
+              onClick={() => setQty(Math.min(displayStock, qty + 1))}
               className="w-10 h-12 flex items-center justify-center transition-colors"
               style={{ color: "var(--text-muted)" }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold)")}

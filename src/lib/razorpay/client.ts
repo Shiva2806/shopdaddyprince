@@ -40,7 +40,7 @@ export async function openRazorpayCheckout(opts: RazorpayOptions) {
     amount: opts.amount,
     currency: opts.currency ?? "INR",
     name: opts.name ?? "Daddy Prince",
-    description: opts.description ?? "Heritage Indian Arts",
+    description: opts.description ?? "Fine Indian Arts & Crafts",
     order_id: opts.orderId,
     prefill: opts.prefill,
     theme: { color: "#C9A84C" },

@@ -550,7 +550,7 @@ export default function AccountClient({ session, initialProfile, initialOrders }
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       {[
-                        { label: "Browse Catalog", action: () => router.push("/shop"), desc: "Browse heritage Indian art pieces" },
+                        { label: "Browse Catalog", action: () => router.push("/shop"), desc: "Browse fine Indian art pieces" },
                         { label: "Update Profile Settings", action: () => changeTab("settings"), desc: "Keep credentials and phone updated" },
                         { label: "Manage Saved Locations", action: () => changeTab("addresses"), desc: "Manage billing and delivery address" },
                       ].map((a, idx) => (

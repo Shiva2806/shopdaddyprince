@@ -104,6 +104,44 @@ export type Database = {
           updated_at?: string
         }
       }
+      product_variants: {
+        Row: {
+          id: string
+          product_id: string
+          dimension: string
+          price: number
+          sale_price: number | null
+          stock: number
+          sku: string | null
+          weight_grams: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          dimension: string
+          price: number
+          sale_price?: number | null
+          stock?: number
+          sku?: string | null
+          weight_grams?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          dimension?: string
+          price?: number
+          sale_price?: number | null
+          stock?: number
+          sku?: string | null
+          weight_grams?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       orders: {
         Row: {
           id: string

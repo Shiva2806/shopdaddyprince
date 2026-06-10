@@ -21,6 +21,7 @@ export default function NewProduct() {
   });
   const [categories, setCategories] = useState<string[]>(["paintings"]);
   const [isFeatured, setIsFeatured] = useState(false);
+  const [variants, setVariants] = useState<any[]>([]);
 
   const supabase = createClient() as any;
 
@@ -121,11 +122,22 @@ export default function NewProduct() {
           history: [],
         }),
       });
-      const data = await res.json();
+      
+      let data;
+      try {
+        data = await res.json();
+      } catch (e) {
+        throw new Error(`Server returned HTTP ${res.status}: ${res.statusText}`);
+      }
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Failed to generate AI description");
+      }
+
       set("description", data.reply);
       toast.success("AI description generated");
-    } catch {
-      toast.error("AI generation failed");
+    } catch (err: any) {
+      toast.error(err.message || "AI generation failed");
     }
     setAiLoading(false);
   };
@@ -147,6 +159,7 @@ export default function NewProduct() {
           categories,
           is_featured: isFeatured,
           images,
+          variants,
         }),
       });
 
@@ -324,6 +337,185 @@ export default function NewProduct() {
                         >
                           <X size={12} />
                         </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Product Variants */}
+              <div className="glass-card p-6 space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-display text-xl" style={{ color: "var(--text)" }}>Product Variants (Dimensions & Sizes)</h2>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVariants([...variants, { dimension: "", price: "", sale_price: "", stock: "1", sku: "", weight_grams: "" }]);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 font-body text-xs tracking-widest uppercase transition-all"
+                    style={{ border: "1px solid var(--border)", color: "var(--gold)", backgroundColor: "var(--gold-glow)" }}
+                  >
+                    + Add Variant
+                  </button>
+                </div>
+
+                {variants.length === 0 ? (
+                  <p className="font-body text-xs text-center py-6" style={{ color: "var(--text-faint)" }}>
+                    No variants added. The product will use the main price and stock details from the sidebar.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {variants.map((v, idx) => (
+                      <div key={idx} className="p-4 border rounded space-y-3 relative" style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-subtle)" }}>
+                        <div className="flex justify-between items-center">
+                          <span className="font-body text-[10px] tracking-widest uppercase" style={{ color: "var(--gold)" }}>Variant #{idx + 1}</span>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => {
+                                const list = [...variants];
+                                const temp = list[idx];
+                                list[idx] = list[idx - 1];
+                                list[idx - 1] = temp;
+                                setVariants(list);
+                              }}
+                              className="text-xs px-2 py-1 border hover:border-gold disabled:opacity-30"
+                              style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                            >
+                              ↑
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === variants.length - 1}
+                              onClick={() => {
+                                const list = [...variants];
+                                const temp = list[idx];
+                                list[idx] = list[idx + 1];
+                                list[idx + 1] = temp;
+                                setVariants(list);
+                              }}
+                              className="text-xs px-2 py-1 border hover:border-gold disabled:opacity-30"
+                              style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                            >
+                              ↓
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setVariants(variants.filter((_, i) => i !== idx));
+                              }}
+                              className="text-xs px-2 py-1 border border-red-500/30 hover:bg-red-500/10 text-red-500"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
+                          <div className="col-span-2">
+                            {label("Size/Dimension", true)}
+                            <input
+                              value={v.dimension}
+                              onChange={(e) => {
+                                const list = [...variants];
+                                list[idx].dimension = e.target.value;
+                                setVariants(list);
+                              }}
+                              placeholder="e.g. 12x16 inches"
+                              className={inputClass}
+                              style={inputStyle}
+                              onFocus={onFocus}
+                              onBlur={onBlur}
+                              required
+                            />
+                          </div>
+                          <div>
+                            {label("Price (₹)", true)}
+                            <input
+                              type="number"
+                              value={v.price}
+                              onChange={(e) => {
+                                const list = [...variants];
+                                list[idx].price = e.target.value;
+                                setVariants(list);
+                              }}
+                              placeholder="8999"
+                              className={inputClass}
+                              style={inputStyle}
+                              onFocus={onFocus}
+                              onBlur={onBlur}
+                              required
+                            />
+                          </div>
+                          <div>
+                            {label("Sale Price (₹)")}
+                            <input
+                              type="number"
+                              value={v.sale_price}
+                              onChange={(e) => {
+                                const list = [...variants];
+                                list[idx].sale_price = e.target.value;
+                                setVariants(list);
+                              }}
+                              placeholder="7999"
+                              className={inputClass}
+                              style={inputStyle}
+                              onFocus={onFocus}
+                              onBlur={onBlur}
+                            />
+                          </div>
+                          <div>
+                            {label("Stock", true)}
+                            <input
+                              type="number"
+                              value={v.stock}
+                              onChange={(e) => {
+                                const list = [...variants];
+                                list[idx].stock = e.target.value;
+                                setVariants(list);
+                              }}
+                              placeholder="5"
+                              className={inputClass}
+                              style={inputStyle}
+                              onFocus={onFocus}
+                              onBlur={onBlur}
+                              required
+                            />
+                          </div>
+                          <div>
+                            {label("SKU / Weight (g)")}
+                            <div className="flex gap-1">
+                              <input
+                                value={v.sku}
+                                onChange={(e) => {
+                                  const list = [...variants];
+                                  list[idx].sku = e.target.value;
+                                  setVariants(list);
+                                }}
+                                placeholder="SKU"
+                                className={inputClass}
+                                style={{ ...inputStyle, minWidth: "0" }}
+                                onFocus={onFocus}
+                                onBlur={onBlur}
+                              />
+                              <input
+                                type="number"
+                                value={v.weight_grams}
+                                onChange={(e) => {
+                                  const list = [...variants];
+                                  list[idx].weight_grams = e.target.value;
+                                  setVariants(list);
+                                }}
+                                placeholder="grams"
+                                className={inputClass}
+                                style={{ ...inputStyle, minWidth: "0" }}
+                                onFocus={onFocus}
+                                onBlur={onBlur}
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>

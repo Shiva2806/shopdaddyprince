@@ -13,7 +13,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen pt-16 flex items-center justify-center" style={{ backgroundColor: "var(--bg)" }}>
+      <div className="min-h-screen pt-20 flex items-center justify-center" style={{ backgroundColor: "var(--bg)" }}>
         <div className="text-center">
           <div
             className="w-24 h-24 flex items-center justify-center rounded-full mx-auto mb-6"
@@ -23,7 +23,7 @@ export default function CartPage() {
           </div>
           <h1 className="font-display text-4xl mb-3" style={{ color: "var(--text)" }}>Your cart is empty</h1>
           <p className="font-body text-sm mb-8" style={{ color: "var(--text-muted)" }}>
-            Discover our curated collection of heritage Indian arts.
+            Discover our curated collection of fine Indian arts.
           </p>
           <Link href="/shop/paintings" className="btn-gold">Explore Collection</Link>
         </div>
@@ -32,7 +32,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen pt-16" style={{ backgroundColor: "var(--bg)" }}>
+    <div className="min-h-screen pt-20" style={{ backgroundColor: "var(--bg)" }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-12">
         {/* Header */}
         <div className="flex items-end justify-between mb-10">
@@ -77,9 +77,9 @@ export default function CartPage() {
               ))}
             </div>
 
-            {items.map(({ product: p, quantity }) => (
+            {items.map(({ product: p, quantity, variantId, selectedDimension, priceAtPurchase }) => (
               <div
-                key={p.id}
+                key={`${p.id}-${variantId || ""}`}
                 className="grid grid-cols-1 md:grid-cols-12 gap-4 py-6 items-center"
                 style={{ borderBottom: "1px solid var(--border)" }}
               >
@@ -96,24 +96,31 @@ export default function CartPage() {
                         {p.name}
                       </h3>
                     </Link>
-                    <p className="font-body text-[10px] mb-1" style={{ color: "var(--text-faint)" }}>{p.artist}</p>
-                    <p className="font-body text-[10px]" style={{ color: "var(--text-faint)" }}>{p.origin}</p>
+                    <p className="font-body text-[10px] mb-1" style={{ color: "var(--text-faint)" }}>{p.artist} · {p.origin}</p>
+                    {selectedDimension && (
+                      <div className="mt-2.5">
+                        <span className="inline-block font-body text-[9px] tracking-wider uppercase px-2 py-0.5"
+                          style={{ border: "1px solid var(--border)", color: "var(--gold)", backgroundColor: "var(--gold-glow)" }}>
+                          Size: {selectedDimension}
+                        </span>
+                      </div>
+                    )}
                     <p className="font-body text-xs mt-2 md:hidden font-medium" style={{ color: "var(--gold)" }}>
-                      {formatPrice(p.price)}
+                      {formatPrice(priceAtPurchase ?? p.price)}
                     </p>
                   </div>
                 </div>
 
                 {/* Unit price (desktop) */}
                 <div className="hidden md:block md:col-span-2">
-                  <p className="font-body text-sm" style={{ color: "var(--text-muted)" }}>{formatPrice(p.price)}</p>
+                  <p className="font-body text-sm" style={{ color: "var(--text-muted)" }}>{formatPrice(priceAtPurchase ?? p.price)}</p>
                 </div>
 
                 {/* Quantity */}
                 <div className="md:col-span-2 flex items-center gap-3">
                   <div className="flex items-center" style={{ border: "1px solid var(--border)" }}>
                     <button
-                      onClick={() => updateQuantity(p.id, quantity - 1)}
+                      onClick={() => updateQuantity(p.id, quantity - 1, variantId)}
                       className="w-8 h-8 flex items-center justify-center transition-colors"
                       style={{ color: "var(--text-muted)" }}
                       onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold)")}
@@ -128,7 +135,7 @@ export default function CartPage() {
                       {quantity}
                     </span>
                     <button
-                      onClick={() => updateQuantity(p.id, quantity + 1)}
+                      onClick={() => updateQuantity(p.id, quantity + 1, variantId)}
                       className="w-8 h-8 flex items-center justify-center transition-colors"
                       style={{ color: "var(--text-muted)" }}
                       onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold)")}
@@ -138,7 +145,7 @@ export default function CartPage() {
                     </button>
                   </div>
                   <button
-                    onClick={() => removeItem(p.id)}
+                    onClick={() => removeItem(p.id, variantId)}
                     className="transition-colors"
                     style={{ color: "var(--text-faint)" }}
                     onMouseEnter={(e) => (e.currentTarget.style.color = "#E05030")}
@@ -151,7 +158,7 @@ export default function CartPage() {
                 {/* Line total (desktop) */}
                 <div className="hidden md:block md:col-span-2 text-right">
                   <p className="font-body text-sm font-medium" style={{ color: "var(--gold)" }}>
-                    {formatPrice(p.price * quantity)}
+                    {formatPrice((priceAtPurchase ?? p.price) * quantity)}
                   </p>
                 </div>
               </div>
