@@ -36,7 +36,7 @@ export default function SettingsPage() {
 
   const [paymentForm, setPaymentForm] = useState({
     razorpayKeyId: "rzp_test_SzE8uuduZMqsJv",
-    razorpayWebhookSecret: "whsec_0hamC8CMoYl5vAdPRsoI3TAL",
+    razorpayWebhookSecret: "dummy_webhook_secret",
     mode: "sandbox",
     currency: "INR"
   });

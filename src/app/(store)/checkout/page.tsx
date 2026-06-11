@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/utils/format";
 import { ChevronRight, Shield, Lock } from "lucide-react";
@@ -8,6 +8,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { openRazorpayCheckout } from "@/lib/razorpay/client";
+import { useSession } from "next-auth/react";
+import { useAuthModalStore } from "@/store/authModal";
 
 type Step = "address" | "review" | "payment";
 
@@ -42,11 +44,32 @@ export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCartStore();
   const [step, setStep] = useState<Step>("address");
   const [loading, setLoading] = useState(false);
+  const { data: session, status } = useSession();
+  const openModal = useAuthModalStore((state) => state.open);
 
   const [address, setAddress] = useState<Address>({
     full_name: "", phone: "", line1: "", line2: "",
     city: "", state: "", pincode: "",
   });
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      openModal("/checkout");
+      router.replace("/cart");
+    }
+  }, [status, openModal, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center" style={{ backgroundColor: "var(--bg)" }}>
+        <div className="text-center">
+          <p className="font-display text-xl animate-pulse" style={{ color: "var(--gold)" }}>
+            Securing your session...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const shipping = totalPrice() >= 500000 ? 0 : 9900;
   const grandTotal = totalPrice() + shipping;
@@ -197,7 +220,7 @@ export default function CheckoutPage() {
         <div className="text-center mb-12 flex flex-col items-center">
           <Link href="/" className="flex flex-col items-center gap-2 group">
             <img
-              src="/favicon.ico"
+              src="/favicon.png"
               alt="Daddy Prince Logo"
               className="w-10 h-10 object-contain transition-transform duration-300 group-hover:scale-105"
             />

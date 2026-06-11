@@ -49,7 +49,7 @@ export default async function ShopPage({ params, searchParams }: Props) {
     artist: p.artist || "Unknown",
     price: p.price,
     compareAt: p.compare_at_price || undefined,
-    image: p.images?.[0] || "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=500&q=80",
+    image: p.images?.[0] || "/images/categories/product_banners/painting.webp",
     images: p.images || [],
     category: category,
     subcategory: p.subcategory || "",

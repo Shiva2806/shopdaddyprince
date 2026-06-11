@@ -3,6 +3,9 @@ import "@/styles/globals.css";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import CookieConsent from "@/components/layout/CookieConsent";
+import WelcomePopup from "@/components/layout/WelcomePopup";
+import LoginModal from "@/components/auth/LoginModal";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://shopdaddyprince.com"),
@@ -49,11 +52,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem("dp-theme");
+                  var theme = saved || "light";
+                  document.documentElement.setAttribute("data-theme", theme);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         <ThemeProvider>
           <AuthProvider>
             {children}
+            <CookieConsent />
+            <WelcomePopup />
+            <LoginModal />
             <Toaster
               position="bottom-right"
               toastOptions={{

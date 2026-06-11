@@ -32,7 +32,7 @@ export default function AdminSidebar() {
       {/* Logo */}
       <div className="px-6 py-6 border-b border-[var(--border)] flex items-center gap-3">
         <img
-          src="/favicon.ico"
+          src="/favicon.png"
           alt="Daddy Prince Logo"
           className="w-8 h-8 object-contain"
         />

@@ -2,8 +2,10 @@
 
 import { useState, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import ProductGrid from "./ProductGrid";
 import { getCollectionDetail } from "@/utils/collectionContent";
+import EmptyCollectionState from "./EmptyCollectionState";
 
 interface UIProduct {
   id: string;
@@ -56,6 +58,32 @@ export default function SaleClient({ initialProducts = [], activeSort }: Props) 
 
   const detail = getCollectionDetail("sale");
 
+  // FUTURE LOGIC:
+  // if (products.length > 0) { ... } else { ... }
+  // FOR LAUNCH: Force Coming Soon placeholder page regardless of product count.
+  const forceComingSoon = true;
+
+  if (forceComingSoon) {
+    return (
+      <div className="min-h-[85vh] flex items-center justify-center px-4 py-20 bg-theme">
+        <EmptyCollectionState
+          isSale={true}
+          eyebrow="SPECIAL OFFERS"
+          heading="Exclusive Offers Coming Soon"
+          description={
+            <>
+              We are preparing special offers on selected handcrafted artworks, heritage décor, and collector pieces.
+              <br />
+              <span className="block mt-2">Join us soon for curated savings without compromising craftsmanship.</span>
+            </>
+          }
+          buttonText="Explore Collections"
+          buttonLink="/shop"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pt-20" style={{ backgroundColor: "var(--bg)" }}>
       {/* Section 1: Editorial Collection Introduction */}
@@ -63,10 +91,13 @@ export default function SaleClient({ initialProducts = [], activeSort }: Props) 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
           {/* Large Hero Image */}
           <div className="relative aspect-[4/3] sm:aspect-[16/10] md:aspect-[4/3] lg:aspect-[16/11] overflow-hidden rounded-lg group shadow-xl border border-[var(--border)] bg-[var(--bg-subtle)]">
-            <img
+            <Image
               src={detail.image}
               alt={detail.title}
-              className="w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
+              className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
             />
             {/* Elegant overlay shadow */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
@@ -111,27 +142,33 @@ export default function SaleClient({ initialProducts = [], activeSort }: Props) 
 
       {/* Section 3: Product Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
-        {/* Controls and Sort Select */}
-        <div className="flex items-center justify-between mb-8 pb-4 border-b border-[var(--border)]">
-          <p className="font-body text-xs text-[var(--text-faint)]">
-            Showing {products.length} {products.length === 1 ? "piece" : "pieces"}
-          </p>
+        {products.length > 0 ? (
+          <>
+            {/* Controls and Sort Select */}
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-[var(--border)]">
+              <p className="font-body text-xs text-[var(--text-faint)]">
+                Showing {products.length} {products.length === 1 ? "piece" : "pieces"}
+              </p>
 
-          <div className="flex items-center gap-3">
-            <select
-              value={activeSort}
-              onChange={(e) => setParam("sort", e.target.value)}
-              className="font-body text-[10px] tracking-wider uppercase px-4 py-2 focus:outline-none cursor-pointer glass-card"
-              style={{ color: "var(--text-muted)", minWidth: "150px" }}
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+              <div className="flex items-center gap-3">
+                <select
+                  value={activeSort}
+                  onChange={(e) => setParam("sort", e.target.value)}
+                  className="font-body text-[10px] tracking-wider uppercase px-4 py-2 focus:outline-none cursor-pointer glass-card"
+                  style={{ color: "var(--text-muted)", minWidth: "150px" }}
+                >
+                  {SORT_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-        <ProductGrid products={products} />
+            <ProductGrid products={products} />
+          </>
+        ) : (
+          <EmptyCollectionState isSale={true} />
+        )}
       </div>
     </div>
   );

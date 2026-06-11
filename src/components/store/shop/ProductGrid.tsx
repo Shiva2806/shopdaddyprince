@@ -9,7 +9,7 @@ import type { Product } from "@/types";
 
 interface PlaceholderProduct {
   id: string; slug: string; name: string; artist: string;
-  price: number; image: string; category: string;
+  price: number; image: string; images?: string[]; category: string;
   subcategory: string; origin: string; stock: number;
 }
 
@@ -63,11 +63,28 @@ export default function ProductGrid({ products }: { products: PlaceholderProduct
           >
             {/* Image */}
             <div className="relative overflow-hidden aspect-[3/4]">
-              <img
-                src={p.image}
-                alt={p.name}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
-              />
+              {p.images && p.images.length >= 2 ? (
+                <>
+                  {/* Primary Image */}
+                  <img
+                    src={p.images[0]}
+                    alt={p.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-[1.06] lg:group-hover:opacity-0"
+                  />
+                  {/* Hover Image */}
+                  <img
+                    src={p.images[1]}
+                    alt={p.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-in-out opacity-0 lg:group-hover:opacity-100 lg:group-hover:scale-[1.06] pointer-events-none"
+                  />
+                </>
+              ) : (
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                />
+              )}
 
               {/* Sold out overlay */}
               {p.stock === 0 && (

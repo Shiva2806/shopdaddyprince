@@ -4,9 +4,15 @@ import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/utils/format";
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useAuthModalStore } from "@/store/authModal";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, totalPrice, clearCart } = useCartStore();
+  const { data: session } = useSession();
+  const openModal = useAuthModalStore((state) => state.open);
+  const router = useRouter();
 
   const shipping = totalPrice() >= 500000 ? 0 : 9900;
   const grandTotal = totalPrice() + shipping;
@@ -206,9 +212,19 @@ export default function CartPage() {
                 <span className="font-display text-2xl text-gold-shimmer">{formatPrice(grandTotal)}</span>
               </div>
 
-              <Link href="/checkout" className="btn-gold w-full justify-center mb-3">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!session) {
+                    openModal("/checkout");
+                  } else {
+                    router.push("/checkout");
+                  }
+                }}
+                className="btn-gold w-full justify-center mb-3"
+              >
                 Checkout <ArrowRight size={15} />
-              </Link>
+              </button>
 
               <Link
                 href="/shop"

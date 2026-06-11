@@ -189,7 +189,7 @@ export default function AdminProducts() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-12 overflow-hidden shrink-0 border" style={{ borderColor: "var(--border)" }}>
-                          <img src={p.images?.[0] || "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=80&q=60"} alt={p.name} className="w-full h-full object-cover" />
+                          <img src={p.images?.[0] || "/images/categories/product_banners/painting.webp"} alt={p.name} className="w-full h-full object-cover" />
                         </div>
                         <div>
                           <p className="font-body text-sm font-semibold truncate max-w-[200px]" style={{ color: "var(--text)" }}>{p.name}</p>

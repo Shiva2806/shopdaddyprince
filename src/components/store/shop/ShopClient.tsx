@@ -2,11 +2,13 @@
 
 import { useState, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import { CATEGORIES, type ProductCategory } from "@/types";
 import ShopSidebar from "./ShopSidebar";
 import ProductGrid from "./ProductGrid";
 import { SlidersHorizontal, X } from "lucide-react";
 import { getCollectionDetail } from "@/utils/collectionContent";
+import EmptyCollectionState from "./EmptyCollectionState";
 
 interface UIProduct {
   id: string;
@@ -84,10 +86,13 @@ export default function ShopClient({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
           {/* Large Hero Image */}
           <div className="relative aspect-[4/3] sm:aspect-[16/10] md:aspect-[4/3] lg:aspect-[16/11] overflow-hidden rounded-lg group shadow-xl border border-[var(--border)] bg-[var(--bg-subtle)]">
-            <img
+            <Image
               src={detail.image}
               alt={detail.title}
-              className="w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
+              className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
             />
             {/* Elegant overlay shadow */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
@@ -171,36 +176,42 @@ export default function ShopClient({
 
           {/* Product grid container */}
           <div className="flex-1 min-w-0">
-            {/* Utility bar for sorting and mobile filter */}
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-[var(--border)]">
-              <p className="font-body text-xs text-[var(--text-faint)]">
-                Showing {products.length} {products.length === 1 ? "piece" : "pieces"}
-              </p>
+            {products.length > 0 ? (
+              <>
+                {/* Utility bar for sorting and mobile filter */}
+                <div className="flex items-center justify-between mb-8 pb-4 border-b border-[var(--border)]">
+                  <p className="font-body text-xs text-[var(--text-faint)]">
+                    Showing {products.length} {products.length === 1 ? "piece" : "pieces"}
+                  </p>
 
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-2 font-body text-[10px] tracking-widest uppercase transition-colors glass-card"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  <SlidersHorizontal size={12} />
-                  Filter
-                </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setSidebarOpen(true)}
+                      className="lg:hidden flex items-center gap-2 px-4 py-2 font-body text-[10px] tracking-widest uppercase transition-colors glass-card"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      <SlidersHorizontal size={12} />
+                      Filter
+                    </button>
 
-                <select
-                  value={activeSort}
-                  onChange={(e) => setParam("sort", e.target.value)}
-                  className="font-body text-[10px] tracking-wider uppercase px-4 py-2 focus:outline-none cursor-pointer glass-card"
-                  style={{ color: "var(--text-muted)", minWidth: "150px" }}
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="price-asc">Price: Low → High</option>
-                  <option value="price-desc">Price: High → Low</option>
-                </select>
-              </div>
-            </div>
+                    <select
+                      value={activeSort}
+                      onChange={(e) => setParam("sort", e.target.value)}
+                      className="font-body text-[10px] tracking-wider uppercase px-4 py-2 focus:outline-none cursor-pointer glass-card"
+                      style={{ color: "var(--text-muted)", minWidth: "150px" }}
+                    >
+                      <option value="newest">Newest First</option>
+                      <option value="price-asc">Price: Low → High</option>
+                      <option value="price-desc">Price: High → Low</option>
+                    </select>
+                  </div>
+                </div>
 
-            <ProductGrid products={products} />
+                <ProductGrid products={products} />
+              </>
+            ) : (
+              <EmptyCollectionState />
+            )}
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ const categories = [
     label: "Paintings",
     slug: "paintings",
     image: "/images/categories/painting.webp",
+    description: "Timeless artworks inspired by Indian culture, spirituality, and heritage.",
     sub: "Traditional · Abstracts · Portraits",
     accent: "rgba(200,168,107,0.15)",
   },
@@ -17,27 +18,31 @@ const categories = [
     label: "Home Decor",
     slug: "home-decor",
     image: "/images/categories/walldecor.webp",
+    description: "Curated décor pieces crafted to elevate luxury living spaces.",
     sub: "Masks · Jharokhas · Hangings",
     accent: "rgba(200,168,107,0.15)",
   },
   {
-    label: "Regional Arts",
+    label: "Regional Heritage",
     slug: "regional-arts",
     image: "/images/categories/regional arts.webp",
+    description: "Authentic handcrafted treasures celebrating India's diverse artistic traditions.",
     sub: "Kalamkari · Warli · Patachitra",
     accent: "rgba(200,168,107,0.12)",
   },
   {
-    label: "Brass",
+    label: "Brass Collection",
     slug: "brass",
     image: "/images/categories/brass.webp",
+    description: "Exquisite brass sculptures and artifacts showcasing enduring Indian artistry.",
     sub: "Idols · Artifacts · Hangings",
     accent: "rgba(200,168,107,0.15)",
   },
   {
-    label: "Vintage",
+    label: "Vintage Collection",
     slug: "vintage",
     image: "/images/categories/vintage.webp",
+    description: "Rare vintage-inspired collectibles with timeless character and craftsmanship.",
     sub: "Antiques · Furniture · Stools",
     accent: "rgba(200,168,107,0.15)",
   },
@@ -182,8 +187,8 @@ function CategoryCard({
       />
 
       {/* Text Info */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 z-30">
-        <p className="font-display text-2xl md:text-3xl text-white mb-1 transition-transform duration-300 group-hover:-translate-y-1">
+      <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 z-30 transition-transform duration-300 group-hover:-translate-y-2">
+        <p className="font-display text-2xl md:text-3xl text-white mb-1">
           {cat.label}
         </p>
         <p
@@ -191,6 +196,9 @@ function CategoryCard({
           style={{ color: "var(--gold-light)" }}
         >
           {cat.sub}
+        </p>
+        <p className="font-body text-[11px] text-white/75 mt-2 leading-relaxed opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-hover:opacity-100 group-hover:max-h-16 hidden sm:block">
+          {cat.description}
         </p>
       </div>
 

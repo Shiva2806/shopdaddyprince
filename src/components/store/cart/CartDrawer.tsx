@@ -6,6 +6,9 @@ import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/utils/format";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useAuthModalStore } from "@/store/authModal";
 
 interface Props {
   open: boolean;
@@ -14,6 +17,9 @@ interface Props {
 
 export default function CartDrawer({ open, onClose }: Props) {
   const { items, removeItem, updateQuantity, totalItems, totalPrice } = useCartStore();
+  const { data: session } = useSession();
+  const openModal = useAuthModalStore((state) => state.open);
+  const router = useRouter();
 
   // Lock body scroll when open
   useEffect(() => {
@@ -249,14 +255,22 @@ export default function CartDrawer({ open, onClose }: Props) {
               </div>
 
               {/* Checkout button */}
-              <Link
-                href="/checkout"
-                onClick={onClose}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!session) {
+                    onClose();
+                    openModal("/checkout");
+                  } else {
+                    onClose();
+                    router.push("/checkout");
+                  }
+                }}
                 className="btn-gold w-full justify-center"
               >
                 Proceed to Checkout
                 <ArrowRight size={15} />
-              </Link>
+              </button>
 
               <Link
                 href="/cart"

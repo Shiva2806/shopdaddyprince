@@ -20,15 +20,15 @@ export const CATEGORIES: Record<
     subcategories: ["Masks", "Jharokhas", "Hangings", "Thorans", "Show Pieces"],
   },
   "regional-arts": {
-    label: "Regional",
+    label: "Regional Heritage",
     subcategories: ["Kalamkari", "Kondapalli", "Lippan", "Warli", "Patachitra", "Cherial"],
   },
   brass: {
-    label: "Brass",
+    label: "Brass Collection",
     subcategories: ["Idols", "Artifacts", "Hangings"],
   },
   vintage: {
-    label: "Vintage",
+    label: "Vintage Collection",
     subcategories: ["Antiques", "Furniture", "Stools"],
   },
 };

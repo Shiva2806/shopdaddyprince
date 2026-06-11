@@ -77,7 +77,7 @@ export default function Newsletter() {
           </button>
         </form>
 
-        <p className="font-body text-[10px] mt-4 tracking-wide" style={{ color: "var(--text-faint)" }}>
+        <p className="font-body text-[10px] mt-4 tracking-wide" style={{ color: "var(--text-muted)" }}>
           No spam. Only meaningful arrivals.
         </p>
       </div>
