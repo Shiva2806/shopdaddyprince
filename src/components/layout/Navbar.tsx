@@ -118,7 +118,7 @@ export default function Navbar() {
               className="flex items-center shrink-0 group"
             >
               <img
-                src="/favicon.png"
+                src={mounted && theme === "light" ? "/favicon.png" : "/favicon.ico"}
                 alt="Daddy Prince Logo"
                 className={`object-contain transition-all duration-300 group-hover:scale-105 ${scrolled ? "w-10 h-10" : "w-12 h-12"}`}
               />
