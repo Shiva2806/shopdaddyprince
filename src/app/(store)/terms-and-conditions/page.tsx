@@ -23,7 +23,7 @@ export default function TermsAndConditionsPage() {
       </div>
 
       <PolicySection title="1. General Information">
-        <p>Daddy Prince is an Indian-based business specializing in arts, crafts, and home décor.</p>
+        <p>Daddy Prince is a premium Indian art, heritage decor, and handcrafted collectibles store.</p>
         <p>
           By accessing our website or making a purchase, you agree that you are at least 18 years old or have parental consent to use our services.
         </p>
@@ -55,11 +55,13 @@ export default function TermsAndConditionsPage() {
       </PolicySection>
 
       <PolicySection title="5. Shipping and Delivery">
-        <p>We deliver across India through trusted courier partners.</p>
+        <p>We deliver domestically across India and internationally to supported countries through trusted courier partners.</p>
         <ul className="list-disc pl-5 space-y-1 mt-2">
-          <li>Standard delivery time: 5–7 business days (custom or made-to-order items may take longer).</li>
-          <li>Delivery times may vary due to location, courier delays, or unforeseen circumstances.</li>
-          <li>Shipping charges (if applicable) will be displayed during checkout.</li>
+          <li>Domestic shipping delivery time: 5–7 business days (custom or handcrafted collectibles may take longer).</li>
+          <li>International shipping delivery time: 7–15 business days (varies by destination).</li>
+          <li>Customs duties, import taxes, and local fees for international orders are the responsibility of the customer unless explicitly stated otherwise.</li>
+          <li>Delivery times may vary due to location, customs clearance, courier delays, or unforeseen circumstances.</li>
+          <li>Shipping charges will be calculated and displayed during checkout before payment.</li>
         </ul>
       </PolicySection>
 
@@ -125,7 +127,7 @@ export default function TermsAndConditionsPage() {
         <div className="mt-4 p-6 bg-[var(--bg-subtle)] border border-[var(--border)] space-y-2 font-display text-sm">
           <p className="font-semibold text-[var(--text)]">Daddy Prince</p>
           <p className="text-[var(--text-muted)]">
-            Email: <a href="mailto:support@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">support@shopdaddyprince.com</a>
+            Email: <a href="mailto:hello@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">hello@shopdaddyprince.com</a>
           </p>
           <p className="text-[var(--text-muted)]">
             Phone / WhatsApp: <a href="https://wa.me/916301206401" className="text-[var(--gold)] hover:underline">+91 63012 06401</a>

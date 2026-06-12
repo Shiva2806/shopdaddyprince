@@ -13,15 +13,15 @@ export const CATEGORIES: Record<
 > = {
   paintings: {
     label: "Paintings",
-    subcategories: ["Traditional", "Abstracts", "Caricatures", "Portraits"],
+    subcategories: ["Traditional Screen Arts", "Abstracts", "Caricatures", "Portraits"],
   },
   "home-decor": {
     label: "Home Decor",
-    subcategories: ["Masks", "Jharokhas", "Hangings", "Thorans", "Show Pieces"],
+    subcategories: ["Wall Decor", "Thorans", "Show Pieces"],
   },
   "regional-arts": {
     label: "Regional Heritage",
-    subcategories: ["Kalamkari", "Kondapalli", "Lippan", "Warli", "Patachitra", "Cherial"],
+    subcategories: ["Kondapalli Toys", "Cheriyal Art", "Patachitra"],
   },
   brass: {
     label: "Brass Collection",

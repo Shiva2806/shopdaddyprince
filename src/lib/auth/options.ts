@@ -132,6 +132,30 @@ export const authOptions: NextAuthOptions = {
             console.error("Error creating profile for Google user:", insertError);
             return false;
           }
+
+          // Dispatch Welcome Email
+          try {
+            console.log(`[WELCOME EMAIL STARTED] welcome email triggered for first-time Google sign-up: ${user.email}`);
+            const { getWelcomeEmail } = await import("@/utils/emailTemplates");
+            const { sendEmail } = await import("@/lib/resend");
+            const { subject, html } = getWelcomeEmail(user.name || "Collector", user.email!);
+            
+            const res = await sendEmail({
+              to: user.email!,
+              subject,
+              html,
+              emailType: "welcome",
+              recipientName: user.name || "Collector",
+            });
+
+            if (res.success) {
+              console.log(`[WELCOME EMAIL SENT] Recipient: ${user.email!}, ID: ${res.resendId}`);
+            } else {
+              console.error(`[WELCOME EMAIL FAILED] Recipient: ${user.email!}, Error:`, res.error);
+            }
+          } catch (emailErr: any) {
+            console.error(`[WELCOME EMAIL FAILED] Recipient: ${user.email!}, Exception:`, emailErr);
+          }
         } else {
           // Update name and avatar if they changed on Google side
           const { error: updateError } = await supabase

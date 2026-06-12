@@ -26,7 +26,7 @@ export default function ReturnPolicyPage() {
           <li>You provide unboxing video proof showing the damage or issue clearly.</li>
         </ul>
         <p className="mt-4">
-          Due to the nature of our products (handcrafted art, décor items, and sarees), minor variations in color, texture, or finish are normal and not considered defects.
+          Due to the nature of our products (handcrafted art, heritage decor, brassware, vintage items, and regional collectibles), minor variations in color, texture, or finish are normal and not considered defects.
         </p>
       </PolicySection>
 
@@ -44,8 +44,8 @@ export default function ReturnPolicyPage() {
         <ol className="list-decimal pl-5 space-y-2 mt-2">
           <li>
             Contact us at{" "}
-            <a href="mailto:support@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">
-              support@shopdaddyprince.com
+            <a href="mailto:hello@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">
+              hello@shopdaddyprince.com
             </a>{" "}
             or WhatsApp{" "}
             <a href="https://wa.me/916301206401" className="text-[var(--gold)] hover:underline">
@@ -58,7 +58,7 @@ export default function ReturnPolicyPage() {
           <li>Please ensure the product is securely packed in its original packaging for pickup.</li>
         </ol>
         <p className="mt-4">
-          Return shipping costs may be covered by us only if the item was defective or incorrect.
+          Return shipping costs may be covered by us only if the item was defective or incorrect. For international orders, returns are generally not accepted unless the item was delivered damaged or incorrect, and the customer is responsible for return shipping fees, customs duties, and local taxes.
         </p>
       </PolicySection>
 
@@ -98,7 +98,7 @@ export default function ReturnPolicyPage() {
         <div className="mt-4 p-6 bg-[var(--bg-subtle)] border border-[var(--border)] space-y-2 font-display text-sm">
           <p className="font-semibold text-[var(--text)]">Daddy Prince</p>
           <p className="text-[var(--text-muted)]">
-            📧 Email: <a href="mailto:support@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">support@shopdaddyprince.com</a>
+            📧 Email: <a href="mailto:hello@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">hello@shopdaddyprince.com</a>
           </p>
           <p className="text-[var(--text-muted)]">
             📱 WhatsApp: <a href="https://wa.me/916301206401" className="text-[var(--gold)] hover:underline">+91 63012 06401</a>

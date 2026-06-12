@@ -22,7 +22,7 @@ export default function SettingsPage() {
   const [brandForm, setBrandForm] = useState({
     storeName: "Daddy Prince",
     tagline: "Fine Indian Arts & Gallery",
-    supportEmail: "support@shopdaddyprince.com",
+    supportEmail: "hello@shopdaddyprince.com",
     supportPhone: "+91 63012 06401",
     footerText: "© 2026 Daddy Prince. All Rights Reserved."
   });

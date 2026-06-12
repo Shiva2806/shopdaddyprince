@@ -65,6 +65,21 @@ export async function PATCH(request: Request) {
     }
 
     const supabase = createAdminClient() as any;
+
+    // Fetch existing order to check previous status and prevent duplicate email dispatch
+    const { data: existingOrder, error: fetchErr } = await supabase
+      .from("orders")
+      .select("status")
+      .eq("id", id)
+      .single();
+
+    if (fetchErr || !existingOrder) {
+      console.error(`Error fetching order ${id} before status update:`, fetchErr);
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    const previousStatus = existingOrder.status;
+
     const { data: order, error: updateErr } = await supabase
       .from("orders")
       .update({ status, updated_at: new Date().toISOString() })
@@ -75,6 +90,51 @@ export async function PATCH(request: Request) {
     if (updateErr) {
       console.error("Admin update order status error:", updateErr);
       return NextResponse.json({ error: updateErr.message }, { status: 500 });
+    }
+
+    // Trigger status update emails asynchronously
+    if (status === "shipped" || status === "delivered") {
+      if (previousStatus !== status) {
+        (async () => {
+          try {
+            console.log(`[ORDER_${status.toUpperCase()}_EMAIL_TRIGGERED] Preparing to send status: ${status} email for order: ${id}`);
+            const { data: fullOrder } = await supabase
+              .from("orders")
+              .select("*, profiles(email, full_name)")
+              .eq("id", id)
+              .single();
+
+            if (fullOrder && fullOrder.profiles) {
+              const email = fullOrder.profiles.email;
+              const customerName = fullOrder.shipping_address?.full_name || fullOrder.profiles.full_name || "Collector";
+
+              if (email && !email.endsWith("@phone.daddyprince.com")) {
+                const { getOrderShippedEmail, getOrderDeliveredEmail } = await import("@/utils/emailTemplates");
+                const { sendEmail } = await import("@/lib/resend");
+
+                const { subject, html } = status === "shipped"
+                  ? getOrderShippedEmail(fullOrder, customerName, email)
+                  : getOrderDeliveredEmail(fullOrder, customerName, email);
+
+                await sendEmail({
+                  to: email,
+                  subject,
+                  html,
+                  emailType: status === "shipped" ? "order_shipped" : "order_delivered",
+                  recipientName: customerName,
+                  metadata: { order_id: id },
+                });
+              } else {
+                console.log(`[ORDER_${status.toUpperCase()}_EMAIL_SKIPPED] Skipped email sending for phone-login/no-email user: ${email}`);
+              }
+            }
+          } catch (emailErr) {
+            console.error(`Failed to send order ${status} email:`, emailErr);
+          }
+        })();
+      } else {
+        console.log(`[ORDER_${status.toUpperCase()}_EMAIL_SKIPPED] Order status is already ${status}. Duplicate email dispatch prevented.`);
+      }
     }
 
     return NextResponse.json({ data: order });

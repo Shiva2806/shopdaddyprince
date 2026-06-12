@@ -15,7 +15,7 @@ export default function FAQPage() {
         {
           id: 1,
           question: "What is Daddy Prince?",
-          answer: "Daddy Prince is an art gallery and home décor store established in 1985, offering a beautiful collection of traditional and contemporary artworks, handcrafted décor pieces and crafts. We blend timeless artistry with modern style to make every home and occasion special."
+          answer: "Daddy Prince is a premium Indian art, heritage decor, and handcrafted collectibles store. Established in 1985, we offer a curated selection of traditional paintings, brassware, vintage items, and regional artworks, bringing the rich heritage of India to homes globally."
         }
       ]
     },
@@ -49,13 +49,13 @@ export default function FAQPage() {
       items: [
         {
           id: 6,
-          question: "Do you offer shipping across India?",
-          answer: "Yes, we deliver to most locations across India through trusted courier partners."
+          question: "Do you offer domestic and international shipping?",
+          answer: "Yes! We provide domestic shipping across India and international shipping to supported countries. International shipping timelines may vary by destination. Please note that customs duties, import taxes, and local fees are the responsibility of the customer."
         },
         {
           id: 7,
           question: "How long does delivery take?",
-          answer: "Delivery usually takes 5–7 business days, depending on your location and product type. Custom artwork or made-to-order items may take longer."
+          answer: "Domestic delivery across India takes 5–7 business days. International delivery takes 7–15 business days depending on the destination. Custom artwork or handcrafted collectibles may take 10–15 business days."
         },
         {
           id: 8,
@@ -75,7 +75,7 @@ export default function FAQPage() {
         {
           id: 10,
           question: "How do I request a refund or replacement?",
-          answer: "Please contact us at support@shopdaddyprince.com or via WhatsApp with your order details and photos of the product. Our team will guide you through the process."
+          answer: "Please contact us at hello@shopdaddyprince.com or via WhatsApp with your order details and photos of the product. Our team will guide you through the process."
         }
       ]
     },
@@ -89,8 +89,8 @@ export default function FAQPage() {
         },
         {
           id: 12,
-          question: "How should I care for my art or saree?",
-          answer: "For art & décor: Keep away from moisture and direct sunlight. Clean gently with a dry cloth."
+          question: "How should I care for my art and collectibles?",
+          answer: "For paintings, brass, and heritage decor: Keep away from moisture and direct sunlight. Clean gently with a soft, dry cloth. Avoid harsh chemicals."
         }
       ]
     },
@@ -104,7 +104,7 @@ export default function FAQPage() {
             <div className="space-y-1">
               <p>You can reach us through:</p>
               <ul className="list-disc pl-5 space-y-0.5">
-                <li>Email: <a href="mailto:support@shopdaddyprince.com" className="text-gold hover:underline">support@shopdaddyprince.com</a></li>
+                <li>Email: <a href="mailto:hello@shopdaddyprince.com" className="text-gold hover:underline">hello@shopdaddyprince.com</a></li>
                 <li>WhatsApp: <a href="https://wa.me/916301206401" className="text-gold hover:underline">+91 63012 06401</a></li>
                 <li>Instagram: <a href="https://www.instagram.com/daddyprince.official/" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">@daddyprince.official</a></li>
               </ul>
@@ -125,11 +125,6 @@ export default function FAQPage() {
           id: 15,
           question: "Do you take custom or bulk orders?",
           answer: "Yes, we accept custom artwork, décor, and handmade craft orders for events, gifts, and interior projects. Please contact us directly to discuss your requirements."
-        },
-        {
-          id: 16,
-          question: "Is international shipping available?",
-          answer: "Currently, we ship only within India, but we’re working to expand internationally soon."
         }
       ]
     }

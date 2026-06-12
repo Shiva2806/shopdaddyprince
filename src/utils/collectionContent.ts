@@ -39,7 +39,12 @@ export const COLLECTION_CONTENT: Record<string, CollectionDetail> = {
 
   // ─── Subcategories ────────────────────────────────────────────────────────────
   "traditional": {
-    title: "Traditional Paintings",
+    title: "Traditional Screen Arts",
+    description: "Ancient themes and classical methodologies. Exquisite works reflecting deep spiritual devotion and complex iconography, painted on organic mediums using natural pigments.",
+    image: "/images/categories/product_banners/painting.webp"
+  },
+  "traditional screen arts": {
+    title: "Traditional Screen Arts",
     description: "Ancient themes and classical methodologies. Exquisite works reflecting deep spiritual devotion and complex iconography, painted on organic mediums using natural pigments.",
     image: "/images/categories/product_banners/painting.webp"
   },
@@ -58,60 +63,35 @@ export const COLLECTION_CONTENT: Record<string, CollectionDetail> = {
     description: "Playful, whimsical, and satirical visual commentaries. Bringing humor and vibrant folklore characters to life through expressive lines and folk aesthetic sensibilities.",
     image: "/images/categories/product_banners/painting.webp"
   },
-  "kalamkari": {
-    title: "Kalamkari Art",
-    description: "The fine art of drawing with bamboo pens and organic vegetable dyes. Discover hand-painted mythological panels and scrolls carrying 23 steps of traditional refinement.",
-    image: "/images/categories/product_banners/regional.webp"
-  },
   "kondapalli": {
     title: "Kondapalli Toys",
     description: "Whimsical softwood figurines hand-carved in Andhra Pradesh. Coated with local paste and painted with vegetable colors, depicting scenes from daily life and mythology.",
     image: "/images/categories/product_banners/regional.webp"
   },
   "cheriyal": {
-    title: "Cheriyal Masks",
-    description: "Stunning, expressive narrative masks crafted from sawdust, tamarind seed paste, and khadi. Painted in vibrant primary colors to illustrate epic folk tales.",
+    title: "Cheriyal Art",
+    description: "Stunning, expressive narrative scrolls and masks crafted from sawdust, tamarind seed paste, and khadi. Painted in vibrant primary colors to illustrate epic folk tales.",
     image: "/images/categories/product_banners/regional.webp"
   },
   "cheriyal masks": {
-    title: "Cheriyal Masks",
-    description: "Stunning, expressive narrative masks crafted from sawdust, tamarind seed paste, and khadi. Painted in vibrant primary colors to illustrate epic folk tales.",
+    title: "Cheriyal Art",
+    description: "Stunning, expressive narrative scrolls and masks crafted from sawdust, tamarind seed paste, and khadi. Painted in vibrant primary colors to illustrate epic folk tales.",
     image: "/images/categories/product_banners/regional.webp"
   },
-  "warli": {
-    title: "Warli Paintings",
-    description: "Scribbles of sacred tribal expression from Maharashtra. Utilizing simple geometric shapes (circle, triangle, square) on cow dung-smeared mud walls with rice flour paste.",
-    image: "/images/categories/product_banners/regional.webp"
-  },
-  "warli paintings": {
-    title: "Warli Paintings",
-    description: "Scribbles of sacred tribal expression from Maharashtra. Utilizing simple geometric shapes (circle, triangle, square) on cow dung-smeared mud walls with rice flour paste.",
+  "cheriyal art": {
+    title: "Cheriyal Art",
+    description: "Stunning, expressive narrative scrolls and masks crafted from sawdust, tamarind seed paste, and khadi. Painted in vibrant primary colors to illustrate epic folk tales.",
     image: "/images/categories/product_banners/regional.webp"
   },
   "patachitra": {
-    title: "Patachitra scrolls",
+    title: "Patachitra",
     description: "Ancient scroll paintings from Odisha and Bengal. Elaborate mythological narratives depicted on hand-processed cloth canvases using highly detailed brushes and natural colors.",
     image: "/images/categories/product_banners/regional.webp"
   },
-  "lippan": {
-    title: "Lippan Art",
-    description: "Traditional mud-and-mirror relief art from the Kutch desert. Intricate white mud textures inlaid with shimmering mirrors, reflecting light to illuminate cozy interior spaces.",
-    image: "/images/categories/product_banners/regional.webp"
-  },
-  "lippan art": {
-    title: "Lippan Art",
-    description: "Traditional mud-and-mirror relief art from the Kutch desert. Intricate white mud textures inlaid with shimmering mirrors, reflecting light to illuminate cozy interior spaces.",
-    image: "/images/categories/product_banners/regional.webp"
-  },
-  "bistar": {
-    title: "Bistar Art",
-    description: "Ancestral tribal metalwork and crafts. Utilizing specialized alloy mixtures to create slender, stylized representations of wildlife, deities, and community rituals.",
-    image: "/images/categories/product_banners/brass.webp"
-  },
-  "bistar art": {
-    title: "Bistar Art",
-    description: "Ancestral tribal metalwork and crafts. Utilizing specialized alloy mixtures to create slender, stylized representations of wildlife, deities, and community rituals.",
-    image: "/images/categories/product_banners/brass.webp"
+  "wall decor": {
+    title: "Wall Decor",
+    description: "Elevate your walls with premium handcrafted frames, wall masks, and artisanal plaques showcasing rich Indian heritage.",
+    image: "/images/categories/product_banners/homedec.webp"
   }
 };
 

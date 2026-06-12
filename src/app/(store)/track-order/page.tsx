@@ -147,8 +147,8 @@ export default function TrackOrderPage() {
               </p>
               <p className="font-body text-xs text-[var(--text-faint)] leading-relaxed">
                 Thank you for your inquiry. For immediate status updates, please reach out to us at{" "}
-                <a href="mailto:support@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">
-                  support@shopdaddyprince.com
+                <a href="mailto:hello@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">
+                  hello@shopdaddyprince.com
                 </a>{" "}
                 referencing Order ID <span className="font-mono text-white">{orderId}</span>.
               </p>

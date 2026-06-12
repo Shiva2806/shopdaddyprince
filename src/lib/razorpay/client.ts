@@ -34,7 +34,7 @@ export async function openRazorpayCheckout(opts: RazorpayOptions) {
   if (!loaded) throw new Error("Razorpay SDK failed to load");
 
   const rzp = new (
-    (window as unknown as Window & { Razorpay: new (o: unknown) => { open: () => void } }).Razorpay
+    (window as unknown as Window & { Razorpay: new (o: unknown) => { open: () => void; on: (event: string, handler: (resp: any) => void) => void } }).Razorpay
   )({
     key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     amount: opts.amount,
@@ -60,6 +60,10 @@ export async function openRazorpayCheckout(opts: RazorpayOptions) {
         opts.onFailure(new Error("Payment window closed"));
       },
     },
+  });
+
+  rzp.on("payment.failed", (response: any) => {
+    opts.onFailure(new Error(response.error?.description || "Payment failed"));
   });
 
   rzp.open();

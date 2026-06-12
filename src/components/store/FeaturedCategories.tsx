@@ -11,7 +11,7 @@ const categories = [
     slug: "paintings",
     image: "/images/categories/painting.webp",
     description: "Timeless artworks inspired by Indian culture, spirituality, and heritage.",
-    sub: "Traditional · Abstracts · Portraits",
+    sub: "Traditional Screen Arts · Abstracts · Portraits",
     accent: "rgba(200,168,107,0.15)",
   },
   {
@@ -19,7 +19,7 @@ const categories = [
     slug: "home-decor",
     image: "/images/categories/walldecor.webp",
     description: "Curated décor pieces crafted to elevate luxury living spaces.",
-    sub: "Masks · Jharokhas · Hangings",
+    sub: "Wall Decor · Thorans · Show Pieces",
     accent: "rgba(200,168,107,0.15)",
   },
   {
@@ -27,7 +27,7 @@ const categories = [
     slug: "regional-arts",
     image: "/images/categories/regional arts.webp",
     description: "Authentic handcrafted treasures celebrating India's diverse artistic traditions.",
-    sub: "Kalamkari · Warli · Patachitra",
+    sub: "Kondapalli Toys · Cheriyal Art · Patachitra",
     accent: "rgba(200,168,107,0.12)",
   },
   {

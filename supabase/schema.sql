@@ -76,7 +76,17 @@ alter table public.products  enable row level security;
 alter table public.orders    enable row level security;
 
 create policy "profiles: self read"   on public.profiles for select using (auth.uid() = id);
-create policy "profiles: self update" on public.profiles for update using (auth.uid() = id);
+create policy "profiles: self update" on public.profiles for update 
+  using (auth.uid() = id)
+  with check (
+    auth.uid() = id
+    and (
+      (case 
+        when (select role from public.profiles where id = auth.uid()) = 'customer' then role = 'customer'
+        else true
+       end)
+    )
+  );
 
 create policy "products: public read" on public.products for select using (is_active = true);
 create policy "products: admin write" on public.products for all using (
@@ -84,7 +94,6 @@ create policy "products: admin write" on public.products for all using (
 );
 
 create policy "orders: owner read"   on public.orders for select using (auth.uid() = user_id);
-create policy "orders: owner insert" on public.orders for insert with check (auth.uid() = user_id);
 create policy "orders: admin all"    on public.orders for all using (
   exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
 );

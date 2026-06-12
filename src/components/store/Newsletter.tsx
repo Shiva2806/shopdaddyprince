@@ -5,16 +5,34 @@ import toast from "react-hot-toast";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 900));
-    toast.success("You're on the list.");
-    setEmail("");
-    setLoading(false);
+    
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, name_field: honeypot }),
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok || data.error) {
+        toast.error(data.error || "Failed to join. Please try again.");
+      } else {
+        toast.success(data.message || "Welcome to the Collector's Circle!");
+        setEmail("");
+      }
+    } catch (err) {
+      toast.error("Failed to connect to server. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,6 +69,16 @@ export default function Newsletter() {
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+          {/* Honeypot field for spam prevention */}
+          <input
+            type="text"
+            name="name_field"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            style={{ display: "none" }}
+            tabIndex={-1}
+            autoComplete="off"
+          />
           <input
             type="email"
             value={email}

@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/options";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { calculateServerTotal } from "@/utils/payment";
 
 const schema = z.object({
   razorpay_order_id: z.string(),
@@ -70,12 +71,54 @@ export async function POST(request: Request) {
 
   // 2. Security: Verify that the amount paid in Razorpay matches the total
   try {
+    // Perform server-side calculation of totals
+    const { subtotal: calcSubtotal, shipping: calcShipping, total: calcTotal } = await calculateServerTotal(items);
+
+    if (calcTotal !== total) {
+      return NextResponse.json({ error: "Tampered order amount detected (total mismatch)" }, { status: 400 });
+    }
+
+    if (calcSubtotal !== subtotal || calcShipping !== shipping) {
+      return NextResponse.json({ error: "Tampered order amount detected (subtotal/shipping mismatch)" }, { status: 400 });
+    }
+
+    // Verify each item's price matches the database price
+    const verifySupabase = createAdminClient() as any;
+    for (const item of items) {
+      let dbPrice = 0;
+      if (item.variant_id) {
+        const { data: variant } = await verifySupabase
+          .from("product_variants")
+          .select("price, sale_price")
+          .eq("id", item.variant_id)
+          .single();
+        if (!variant) {
+          return NextResponse.json({ error: `Variant not found: ${item.variant_id}` }, { status: 400 });
+        }
+        dbPrice = variant.sale_price !== null && variant.sale_price !== undefined ? variant.sale_price : variant.price;
+      } else {
+        const { data: product } = await verifySupabase
+          .from("products")
+          .select("price")
+          .eq("id", item.product_id)
+          .single();
+        if (!product) {
+          return NextResponse.json({ error: `Product not found: ${item.product_id}` }, { status: 400 });
+        }
+        dbPrice = product.price;
+      }
+
+      if (item.price !== dbPrice) {
+        return NextResponse.json({ error: `Tampered item price detected for product: ${item.product_id}` }, { status: 400 });
+      }
+    }
+
     const razorpayOrder = await razorpay.orders.fetch(razorpay_order_id);
-    if (razorpayOrder.amount !== total) {
-      return NextResponse.json({ error: "Tampered order amount detected" }, { status: 400 });
+    if (razorpayOrder.amount !== calcTotal) {
+      return NextResponse.json({ error: "Tampered order amount detected (Razorpay amount mismatch)" }, { status: 400 });
     }
   } catch (err: any) {
-    return NextResponse.json({ error: "Failed to fetch Razorpay order: " + err.message }, { status: 500 });
+    return NextResponse.json({ error: "Failed to verify payment totals: " + err.message }, { status: 500 });
   }
 
   // 3. Create the order in Supabase database
@@ -135,6 +178,44 @@ export async function POST(request: Request) {
       console.error(`Failed to update stock for item ${item.product_id} / variant ${item.variant_id}:`, err);
     }
   }
+
+  // 5. Clear cart in database after successful purchase
+  try {
+    await supabase
+      .from("carts")
+      .delete()
+      .eq("user_id", session.user.id);
+  } catch (err) {
+    console.error("Failed to clear database cart after order creation:", err);
+  }
+
+  // 6. Send Order Confirmation Email asynchronously
+  (async () => {
+    try {
+      console.log(`[ORDER_CONFIRMATION_EMAIL_TRIGGERED] Preparing to send email for order: ${order.id}, recipient: ${session.user?.email}`);
+      const { getOrderConfirmationEmail } = await import("@/utils/emailTemplates");
+      const { sendEmail } = await import("@/lib/resend");
+      const { subject, html } = getOrderConfirmationEmail(
+        order,
+        shipping_address.full_name || session.user?.name || "Collector",
+        session.user?.email || ""
+      );
+      if (session.user?.email && !session.user.email.endsWith("@phone.daddyprince.com")) {
+        await sendEmail({
+          to: session.user.email,
+          subject,
+          html,
+          emailType: "order_confirmation",
+          recipientName: shipping_address.full_name || session.user?.name || "Collector",
+          metadata: { order_id: order.id },
+        });
+      } else {
+        console.log(`[ORDER_CONFIRMATION_EMAIL_SKIPPED] Skipped email sending for phone-login/no-email user: ${session.user?.email}`);
+      }
+    } catch (emailErr) {
+      console.error("Failed to send order confirmation email:", emailErr);
+    }
+  })();
 
   return NextResponse.json({ success: true, order_id: order.id });
 }

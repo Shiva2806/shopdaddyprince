@@ -260,8 +260,8 @@ export default function ContactPage() {
                   <p className="text-[var(--gold)] text-xs tracking-wider uppercase mb-2">Direct Correspondence</p>
                   <p className="mb-1">
                     <span className="text-[var(--text-muted)]">Email: </span>
-                    <a href="mailto:support@shopdaddyprince.com" className="text-[var(--text)] hover:text-[var(--gold)] transition-colors">
-                      support@shopdaddyprince.com
+                    <a href="mailto:hello@shopdaddyprince.com" className="text-[var(--text)] hover:text-[var(--gold)] transition-colors">
+                      hello@shopdaddyprince.com
                     </a>
                   </p>
                   <p className="mb-3">

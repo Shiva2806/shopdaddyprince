@@ -102,8 +102,8 @@ export default function PrivacyPolicyPage() {
         </ul>
         <p className="mt-4">
           To make such requests, please contact us at{" "}
-          <a href="mailto:support@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">
-            support@shopdaddyprince.com
+          <a href="mailto:hello@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">
+            hello@shopdaddyprince.com
           </a>.
         </p>
       </PolicySection>
@@ -125,7 +125,7 @@ export default function PrivacyPolicyPage() {
         <div className="mt-4 p-6 bg-[var(--bg-subtle)] border border-[var(--border)] space-y-2 font-display text-sm">
           <p className="font-semibold text-[var(--text)]">Daddy Prince</p>
           <p className="text-[var(--text-muted)]">
-            Email: <a href="mailto:support@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">support@shopdaddyprince.com</a>
+            Email: <a href="mailto:hello@shopdaddyprince.com" className="text-[var(--gold)] hover:underline">hello@shopdaddyprince.com</a>
           </p>
           <p className="text-[var(--text-muted)]">
             Phone / WhatsApp: <a href="https://wa.me/916301206401" className="text-[var(--gold)] hover:underline">+91 63012 06401</a>

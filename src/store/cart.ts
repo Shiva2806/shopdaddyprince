@@ -18,6 +18,19 @@ interface CartStore {
   totalPrice: () => number;
 }
 
+const syncCart = async (items: any[]) => {
+  try {
+    // Attempt to sync. API will return 401 if user is not logged in, which we ignore.
+    await fetch("/api/cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items }),
+    });
+  } catch (err) {
+    // Silently ignore sync errors (e.g. offline, not authenticated)
+  }
+};
+
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
@@ -28,17 +41,15 @@ export const useCartStore = create<CartStore>()(
           const existing = state.items.find(
             (i) => i.product.id === product.id && i.variantId === variantId
           );
+          let newItems;
           if (existing) {
-            return {
-              items: state.items.map((i) =>
-                i.product.id === product.id && i.variantId === variantId
-                  ? { ...i, quantity: i.quantity + quantity }
-                  : i
-              ),
-            };
-          }
-          return {
-            items: [
+            newItems = state.items.map((i) =>
+              i.product.id === product.id && i.variantId === variantId
+                ? { ...i, quantity: i.quantity + quantity }
+                : i
+            );
+          } else {
+            newItems = [
               ...state.items,
               {
                 product,
@@ -47,31 +58,40 @@ export const useCartStore = create<CartStore>()(
                 selectedDimension,
                 priceAtPurchase,
               },
-            ],
-          };
+            ];
+          }
+          syncCart(newItems);
+          return { items: newItems };
         });
       },
 
       removeItem: (productId, variantId) => {
-        set((state) => ({
-          items: state.items.filter(
+        set((state) => {
+          const newItems = state.items.filter(
             (i) => !(i.product.id === productId && i.variantId === variantId)
-          ),
-        }));
+          );
+          syncCart(newItems);
+          return { items: newItems };
+        });
       },
 
       updateQuantity: (productId, quantity, variantId) => {
         if (quantity < 1) return get().removeItem(productId, variantId);
-        set((state) => ({
-          items: state.items.map((i) =>
+        set((state) => {
+          const newItems = state.items.map((i) =>
             i.product.id === productId && i.variantId === variantId
               ? { ...i, quantity }
               : i
-          ),
-        }));
+          );
+          syncCart(newItems);
+          return { items: newItems };
+        });
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => {
+        set({ items: [] });
+        syncCart([]);
+      },
 
       totalItems: () =>
         get().items.reduce((sum, i) => sum + i.quantity, 0),
