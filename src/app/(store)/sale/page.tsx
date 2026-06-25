@@ -32,7 +32,7 @@ export default async function SalePage({ searchParams }: Props) {
     id: p.id,
     slug: p.slug,
     name: p.name,
-    artist: p.artist || "Unknown",
+    artist: p.artist || "",
     price: p.price,
     compareAt: p.compare_at_price || undefined,
     image: p.images?.[0] || "/images/categories/product_banners/painting.webp",

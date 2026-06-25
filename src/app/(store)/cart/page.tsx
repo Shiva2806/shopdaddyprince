@@ -102,7 +102,11 @@ export default function CartPage() {
                         {p.name}
                       </h3>
                     </Link>
-                    <p className="font-body text-[10px] mb-1" style={{ color: "var(--text-faint)" }}>{p.artist} · {p.origin}</p>
+                    {p.artist && !/unknown/i.test(p.artist) && (
+                      <p className="font-body text-[10px] mb-1" style={{ color: "var(--text-faint)" }}>
+                        by {p.artist}
+                      </p>
+                    )}
                     {selectedDimension && (
                       <div className="mt-2.5">
                         <span className="inline-block font-body text-[9px] tracking-wider uppercase px-2 py-0.5"

@@ -5,7 +5,9 @@ import { formatPrice } from "@/utils/format";
 import { ShoppingBag, ArrowUpRight } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import toast from "react-hot-toast";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import Reveal from "@/components/ui/Reveal";
+
+import { trackAddToCart } from "@/lib/analytics";
 
 interface FeaturedProduct {
   id: string;
@@ -26,56 +28,14 @@ function ProductCard({ p, handleAdd }: { p: FeaturedProduct; handleAdd: any }) {
   const displayImages = p.images && p.images.length > 0 ? p.images : [p.image];
   const hasSecondaryImage = displayImages.length > 1;
 
-  const cardRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ["start end", "end start"]
-  });
-
-  const [isMobile, setIsMobile] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [lowPerformance, setLowPerformance] = useState(false);
-
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
-    
-    const memory = (navigator as any).deviceMemory;
-    const cores = navigator.hardwareConcurrency;
-    const isLow = (memory && memory < 4) || (cores && cores < 4);
-    setLowPerformance(isLow);
-
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const rawY = useTransform(scrollYProgress, [0, 1], [-12, 12]);
-  const rawScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.1]);
-
-  const yVal = useTransform(rawY, (v) => {
-    if (prefersReducedMotion || lowPerformance) return 0;
-    return isMobile ? v * 0.35 : v;
-  });
-
-  const scaleVal = useTransform(rawScale, (v) => {
-    if (prefersReducedMotion || lowPerformance) return 1.0;
-    return isMobile ? 1.0 + (v - 1.0) * 0.35 : v;
-  });
-
-  const y = useSpring(yVal, { stiffness: 100, damping: 25, mass: 0.5 });
-  const scale = useSpring(scaleVal, { stiffness: 100, damping: 25, mass: 0.5 });
-
   return (
     <Link
-      ref={cardRef}
       href={`/product/${p.slug}`}
-      className="product-card group block glass-card overflow-hidden"
+      className="product-card group flex flex-col h-full glass-card overflow-hidden"
     >
       {/* Image Container */}
-      <div className="relative overflow-hidden aspect-[3/4] bg-black/5">
-        <motion.div style={{ y, scale }} className="w-full h-full relative">
+      <div className="relative overflow-hidden aspect-[3/4] bg-black/5 shrink-0">
+        <div className="w-full h-full relative">
           {/* Primary Image (Catalog Shot) */}
           <img
             src={displayImages[0]}
@@ -93,7 +53,7 @@ function ProductCard({ p, handleAdd }: { p: FeaturedProduct; handleAdd: any }) {
               className="absolute inset-0 w-full h-full object-cover opacity-0 lg:group-hover:opacity-100 transition-opacity duration-700 ease-in-out pointer-events-none"
             />
           )}
-        </motion.div>
+        </div>
 
         {/* Gradient Overlay */}
         <div
@@ -128,16 +88,19 @@ function ProductCard({ p, handleAdd }: { p: FeaturedProduct; handleAdd: any }) {
       </div>
 
       {/* Info */}
-      <div className="p-4">
-        <p className="font-body text-[9px] tracking-[0.25em] uppercase mb-1" style={{ color: "var(--gold)", opacity: 0.6 }}>
-          {p.origin}
-        </p>
-        <h3 className="product-name font-display text-xl leading-tight mb-1">
-          {p.name}
-        </h3>
-        <p className="font-body text-[11px] mb-3" style={{ color: "var(--text-faint)" }}>
-          {p.artist}
-        </p>
+      <div className="p-4 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 className="product-name font-display text-xl leading-tight mb-1 line-clamp-2 h-[2.5em] overflow-hidden">
+            {p.name}
+          </h3>
+          <div className="h-4 mb-3 flex items-center">
+            {p.artist && !/unknown/i.test(p.artist) ? (
+              <p className="font-body text-[11px]" style={{ color: "var(--text-faint)" }}>
+                by {p.artist}
+              </p>
+            ) : null}
+          </div>
+        </div>
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-2">
             <p className="font-body text-sm font-medium" style={{ color: "var(--gold)" }}>
@@ -172,8 +135,15 @@ export default function FeaturedProducts({ initialProducts = [] }: { initialProd
       id: p.id, slug: p.slug, name: p.name, description: "",
       price: p.price, categories: [p.category], images: displayImages,
       stock: p.stock, status: "active", is_featured: true, tags: [],
-      artist: p.artist, origin: p.origin, created_at: "", updated_at: "",
+      artist: p.artist, created_at: "", updated_at: "",
     } as any);
+    trackAddToCart({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      category: p.category,
+      artist: p.artist
+    }, 1);
     toast.success(`Added to cart`);
   };
 
@@ -197,24 +167,26 @@ export default function FeaturedProducts({ initialProducts = [] }: { initialProd
       <div className="w-full h-px mb-0" style={{ background: "linear-gradient(90deg, transparent, var(--gold), transparent)" }} />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-8">
-        <div className="flex items-end justify-between mb-10 md:mb-12 relative overflow-visible">
-          <div className="spotlight-glow" style={{ left: "20%", width: "380px", height: "380px" }} />
-          <div className="relative z-10">
-            <div className="flex items-center gap-4 mb-3">
-              <div className="w-8 h-px" style={{ backgroundColor: "var(--gold)" }} />
-              <p className="font-body text-[10px] tracking-[0.4em] uppercase" style={{ color: "var(--gold)" }}>
-                Handpicked
-              </p>
+        <Reveal>
+          <div className="flex items-end justify-between mb-10 md:mb-12 relative overflow-visible">
+            <div className="spotlight-glow" style={{ left: "20%", width: "380px", height: "380px" }} />
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-3">
+                <div className="w-8 h-px" style={{ backgroundColor: "var(--gold)" }} />
+                <p className="font-body text-[10px] tracking-[0.4em] uppercase" style={{ color: "var(--gold)" }}>
+                  Handpicked
+                </p>
+              </div>
+              <h2 className="font-display text-5xl md:text-6xl" style={{ color: "var(--text-heading)" }}>
+                Featured<br />
+                <span className="text-gold-shimmer">Works</span>
+              </h2>
             </div>
-            <h2 className="font-display text-5xl md:text-6xl" style={{ color: "var(--text-heading)" }}>
-              Featured<br />
-              <span className="text-gold-shimmer">Works</span>
-            </h2>
+            <Link href="/shop" className="btn-ghost hidden md:inline-flex relative z-10">
+              View All
+            </Link>
           </div>
-          <Link href="/shop" className="btn-ghost hidden md:inline-flex relative z-10">
-            View All
-          </Link>
-        </div>
+        </Reveal>
       </div>
 
       {/* Marquee Wrapper - edge to edge on desktop, touch-scroll on mobile */}
@@ -224,8 +196,10 @@ export default function FeaturedProducts({ initialProducts = [] }: { initialProd
           style={{ "--marquee-speed": `${loopDuration}s` } as React.CSSProperties}
         >
           {marqueeProducts.map((p, idx) => (
-            <div key={`${p.id}-${idx}`} className="featured-card-wrapper">
-              <ProductCard p={p} handleAdd={handleAdd} />
+            <div key={`${p.id}-${idx}`} className="featured-card-wrapper h-full">
+              <Reveal className="h-full" delayMs={(idx % 6) * 100}>
+                <ProductCard p={p} handleAdd={handleAdd} />
+              </Reveal>
             </div>
           ))}
         </div>

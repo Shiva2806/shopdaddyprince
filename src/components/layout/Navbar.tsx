@@ -22,59 +22,10 @@ const NAV_LINKS = [
   { label: "Legacy", href: "/about" },
 ];
 
-const REGIONAL_MEGA_MENU = [
-  {
-    column: 1,
-    states: [
-      {
-        name: "Andhra Pradesh",
-        items: [
-          { label: "Kalamkari Paintings", sub: "kalamkari" },
-          { label: "Kondapalli Toys", sub: "kondapalli" },
-        ],
-      },
-      {
-        name: "Telangana",
-        items: [
-          { label: "Cheriyal Masks", sub: "cherial" },
-        ],
-      },
-    ],
-  },
-  {
-    column: 2,
-    states: [
-      {
-        name: "Bihar",
-        items: [
-          { label: "Bistar Art", sub: "bistar" },
-        ],
-      },
-      {
-        name: "Gujarat",
-        items: [
-          { label: "Lippan Art", sub: "lippan" },
-        ],
-      },
-    ],
-  },
-  {
-    column: 3,
-    states: [
-      {
-        name: "Maharashtra",
-        items: [
-          { label: "Warli Paintings", sub: "warli" },
-        ],
-      },
-      {
-        name: "Odisha",
-        items: [
-          { label: "Patachitra", sub: "patachitra" },
-        ],
-      },
-    ],
-  },
+const REGIONAL_MENU_ITEMS = [
+  { label: "Kondapalli Toys", href: "/shop/regional-arts?sub=kondapalli%20toys" },
+  { label: "Cheriyal Masks", href: "/shop/regional-arts?sub=cheriyal%20masks" },
+  { label: "Patachitra", href: "/shop/regional-arts?sub=patachitra" },
 ];
 
 export default function Navbar() {
@@ -152,9 +103,9 @@ export default function Navbar() {
 
                     {hasSubs && (
                       link.category === "regional-arts" ? (
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 translate-y-2 group-hover:translate-y-0">
+                        <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                           <div
-                            className="shadow-2xl w-[520px] p-5 grid grid-cols-3 gap-5 rounded-sm border"
+                            className="shadow-2xl min-w-[170px] py-2 border"
                             style={{
                               background: theme === "light"
                                 ? "var(--bg-card)"
@@ -162,37 +113,17 @@ export default function Navbar() {
                               borderColor: theme === "light" ? "rgba(184, 138, 58, 0.25)" : "rgba(199, 154, 59, 0.2)",
                             }}
                           >
-                            {REGIONAL_MEGA_MENU.map((col) => (
-                              <div key={col.column} className="space-y-3.5">
-                                {col.states.map((state) => (
-                                  <div key={state.name} className="space-y-1">
-                                    <Link
-                                      href={`/shop/regional-arts?state=${encodeURIComponent(state.name)}`}
-                                      className="block font-display text-[11px] tracking-widest uppercase transition-colors"
-                                      style={{ color: "var(--gold)" }}
-                                      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--navbar-hover)")}
-                                      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--gold)")}
-                                    >
-                                      {state.name}
-                                    </Link>
-                                    <div className="h-px bg-white/5 my-1" style={{ backgroundColor: "var(--border)" }} />
-                                    <div className="space-y-1 pl-0.5">
-                                      {state.items.map((item) => (
-                                        <Link
-                                          key={item.label}
-                                          href={`/shop/regional-arts?sub=${item.sub}`}
-                                          className="block font-body text-xs transition-colors"
-                                          style={{ color: "var(--navbar-text-muted)" }}
-                                          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--navbar-hover)")}
-                                          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--navbar-text-muted)")}
-                                        >
-                                          {item.label}
-                                        </Link>
-                                      ))}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
+                            {REGIONAL_MENU_ITEMS.map((item) => (
+                              <Link
+                                key={item.label}
+                                href={item.href}
+                                className="block px-4 py-2 font-body text-xs tracking-wider transition-colors"
+                                style={{ color: "var(--navbar-text-muted)" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--navbar-hover)")}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--navbar-text-muted)")}
+                              >
+                                {item.label}
+                              </Link>
                             ))}
                           </div>
                         </div>
@@ -369,33 +300,17 @@ export default function Navbar() {
                   {hasSubs && isOpen && (
                     <div className="pb-2" style={{ backgroundColor: "var(--bg-subtle)" }}>
                       {link.category === "regional-arts" ? (
-                        <div className="space-y-4 px-8 py-3">
-                          {REGIONAL_MEGA_MENU.flatMap((col) => col.states).map((state) => (
-                            <div key={state.name} className="space-y-1">
-                              <Link
-                                href={`/shop/regional-arts?state=${encodeURIComponent(state.name)}`}
-                                onClick={() => setMenuOpen(false)}
-                                className="block font-display text-xs tracking-wider uppercase"
-                                style={{ color: "var(--gold)" }}
-                              >
-                                {state.name}
-                              </Link>
-                              <div className="pl-3 space-y-1 border-l" style={{ borderColor: "var(--border)" }}>
-                                {state.items.map((item) => (
-                                  <Link
-                                    key={item.label}
-                                    href={`/shop/regional-arts?sub=${item.sub}`}
-                                    onClick={() => setMenuOpen(false)}
-                                    className="block font-body text-xs py-1"
-                                    style={{ color: "var(--text-muted)" }}
-                                  >
-                                    {item.label}
-                                  </Link>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        REGIONAL_MENU_ITEMS.map((item) => (
+                          <Link
+                            key={item.label}
+                            href={item.href}
+                            onClick={() => setMenuOpen(false)}
+                            className="block px-8 py-2.5 font-body text-xs transition-colors"
+                            style={{ color: "var(--text-faint)" }}
+                          >
+                            {item.label}
+                          </Link>
+                        ))
                       ) : (
                         CATEGORIES[link.category!].subcategories.map((sub) => (
                           <Link

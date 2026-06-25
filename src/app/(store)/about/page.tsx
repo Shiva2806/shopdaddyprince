@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
+import Reveal from "@/components/ui/Reveal";
 
 export const metadata: Metadata = {
   title: "The Legacy Story | Daddy Prince",
@@ -85,7 +86,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
             {/* Left Column - Portrait */}
-            <div className="col-span-1 lg:col-span-5 flex justify-center">
+            <Reveal className="col-span-1 lg:col-span-5 flex justify-center w-full">
               <div
                 className="relative w-full max-w-[420px] aspect-[3/4] overflow-hidden p-3 bg-[#2c1809]/20 border border-[var(--gold)]/30 shadow-2xl"
                 style={{
@@ -105,10 +106,10 @@ export default function AboutPage() {
                   />
                 </div>
               </div>
-            </div>
+            </Reveal>
 
             {/* Right Column - Founder Story Content */}
-            <div className="col-span-1 lg:col-span-7 space-y-8">
+            <Reveal className="col-span-1 lg:col-span-7 space-y-8">
               <div className="space-y-3">
                 <div className="flex items-center gap-4">
                   <div className="w-8 h-px bg-[var(--gold)]" />
@@ -135,7 +136,7 @@ export default function AboutPage() {
                   What started as a modest venture soon became a respected name in the world of art and custom creations. More than a business, Prince Arts & Frames was a reflection of his values—hard work, authenticity, craftsmanship, and a deep appreciation for artistic excellence.
                 </p>
               </div>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -149,33 +150,37 @@ export default function AboutPage() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-12 space-y-16">
           {/* Heritage Image */}
-          <div className="relative w-full h-[50vh] md:h-[65vh] overflow-hidden border border-white/10 shadow-2xl">
-            <Image
-              src="/images/legacy/img-4.webp"
-              alt="Four Decades of Screen Art and Framing Craftsmanship"
-              fill
-              sizes="100vw"
-              className="object-cover object-center brightness-75 transition-all duration-700 hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
-          </div>
+          <Reveal>
+            <div className="relative w-full h-[50vh] md:h-[65vh] overflow-hidden border border-white/10 shadow-2xl">
+              <Image
+                src="/images/legacy/img-4.webp"
+                alt="Four Decades of Screen Art and Framing Craftsmanship"
+                fill
+                sizes="100vw"
+                className="object-cover object-center brightness-75 transition-all duration-700 hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
+            </div>
+          </Reveal>
 
           {/* Core Story Block */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-            <div className="col-span-1 md:col-span-4">
-              <h3 className="font-display text-3xl md:text-5xl font-light text-[var(--gold)] tracking-wide">
-                1984 — Present
-              </h3>
+          <Reveal>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+              <div className="col-span-1 md:col-span-4">
+                <h3 className="font-display text-3xl md:text-5xl font-light text-[var(--gold)] tracking-wide">
+                  1984 — Present
+                </h3>
+              </div>
+              <div className="col-span-1 md:col-span-8 space-y-6">
+                <p className="font-display text-xl md:text-2xl font-light text-cream/90 leading-relaxed italic">
+                  "For over four decades, the values established by Prince Satyam have remained unchanged: craftsmanship, authenticity, artistic excellence, and customer trust."
+                </p>
+                <p className="font-body text-sm md:text-base text-cream/60 leading-relaxed">
+                  Every artwork, every frame, and every collection continues to reflect the standards that built Prince Arts & Frames into a respected name across generations. This journey is a testament to the preservation of cultural heritage and the timeless beauty of manual creation.
+                </p>
+              </div>
             </div>
-            <div className="col-span-1 md:col-span-8 space-y-6">
-              <p className="font-display text-xl md:text-2xl font-light text-cream/90 leading-relaxed italic">
-                "For over four decades, the values established by Prince Satyam have remained unchanged: craftsmanship, authenticity, artistic excellence, and customer trust."
-              </p>
-              <p className="font-body text-sm md:text-base text-cream/60 leading-relaxed">
-                Every artwork, every frame, and every collection continues to reflect the standards that built Prince Arts & Frames into a respected name across generations. This journey is a testament to the preservation of cultural heritage and the timeless beauty of manual creation.
-              </p>
-            </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -187,7 +192,7 @@ export default function AboutPage() {
           borderBottom: "1px solid var(--border)",
         }}
       >
-        <div className="max-w-4xl mx-auto px-6 text-center space-y-8">
+        <Reveal className="max-w-4xl mx-auto px-6 text-center space-y-8">
           <div className="flex justify-center items-center gap-3">
             <div className="w-6 h-px bg-[var(--gold)]" />
             <p className="font-body text-[10px] tracking-[0.4em] uppercase text-[var(--gold)]">
@@ -212,7 +217,7 @@ export default function AboutPage() {
               Every product in our gallery is chosen with the same attention to detail and commitment to quality that defined our founder's work. We believe that art is more than decoration—it tells stories, preserves traditions, and creates emotional connections that last for generations.
             </p>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* SECTION 5 — WHAT WE OFFER */}
@@ -224,17 +229,19 @@ export default function AboutPage() {
         }}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-12 space-y-16">
-          <div className="space-y-3 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-4">
-              <div className="w-8 h-px bg-[var(--gold)]" />
-              <p className="font-body text-[10px] tracking-[0.4em] uppercase text-[var(--gold)]">
-                The Collections
-              </p>
+          <Reveal>
+            <div className="space-y-3 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-4">
+                <div className="w-8 h-px bg-[var(--gold)]" />
+                <p className="font-body text-[10px] tracking-[0.4em] uppercase text-[var(--gold)]">
+                  The Collections
+                </p>
+              </div>
+              <h2 className="font-display text-3xl md:text-5xl text-[var(--text)] font-light">
+                What We <span className="text-gold-shimmer font-normal">Offer</span>
+              </h2>
             </div>
-            <h2 className="font-display text-3xl md:text-5xl text-[var(--text)] font-light">
-              What We <span className="text-gold-shimmer font-normal">Offer</span>
-            </h2>
-          </div>
+          </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -255,29 +262,30 @@ export default function AboutPage() {
                 desc: "Handcrafted creations sourced from skilled artisans and craft communities across India, preserving centuries-old traditions."
               }
             ].map((card, i) => (
-              <div
-                key={i}
-                className="p-8 border border-[var(--border)] bg-[var(--bg-card)]/30 hover:border-[var(--gold)] hover:bg-[#2c1809]/10 transition-all duration-500 flex flex-col justify-between group relative"
-                style={{
-                  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                {/* Micro gold corner details */}
-                <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-transparent group-hover:border-[var(--gold)] transition-all duration-300" />
-                <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-transparent group-hover:border-[var(--gold)] transition-all duration-300" />
+              <Reveal key={i} delayMs={i * 100}>
+                <div
+                  className="p-8 border border-[var(--border)] bg-[var(--bg-card)]/30 hover:border-[var(--gold)] hover:bg-[#2c1809]/10 transition-all duration-500 flex flex-col justify-between group relative h-full"
+                  style={{
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  {/* Micro gold corner details */}
+                  <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-transparent group-hover:border-[var(--gold)] transition-all duration-300" />
+                  <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-transparent group-hover:border-[var(--gold)] transition-all duration-300" />
 
-                <div className="space-y-4">
-                  <span className="font-display text-xs text-[var(--gold)] tracking-widest block uppercase font-medium">
-                    0{i + 1}
-                  </span>
-                  <h3 className="font-display text-xl text-[var(--text)] font-medium tracking-wide">
-                    {card.title}
-                  </h3>
-                  <p className="font-body text-xs text-[var(--text-muted)] leading-relaxed">
-                    {card.desc}
-                  </p>
+                  <div className="space-y-4">
+                    <span className="font-display text-xs text-[var(--gold)] tracking-widest block uppercase font-medium">
+                      0{i + 1}
+                    </span>
+                    <h3 className="font-display text-xl text-[var(--text)] font-medium tracking-wide">
+                      {card.title}
+                    </h3>
+                    <p className="font-body text-xs text-[var(--text-muted)] leading-relaxed">
+                      {card.desc}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -294,7 +302,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
             {/* Left Column - Copy */}
-            <div className="col-span-1 lg:col-span-7 space-y-8 order-2 lg:order-1">
+            <Reveal className="col-span-1 lg:col-span-7 space-y-8 order-2 lg:order-1">
               <div className="space-y-3">
                 <div className="flex items-center gap-4">
                   <div className="w-8 h-px bg-[var(--gold)]" />
@@ -316,10 +324,10 @@ export default function AboutPage() {
                   By choosing Daddy Prince, you are not only bringing home a beautiful work of art—you are also helping sustain India's rich craft heritage and supporting the communities that keep these traditions alive.
                 </p>
               </div>
-            </div>
+            </Reveal>
 
             {/* Right Column - Image */}
-            <div className="col-span-1 lg:col-span-5 flex justify-center order-1 lg:order-2">
+            <Reveal className="col-span-1 lg:col-span-5 flex justify-center order-1 lg:order-2 w-full">
               <div
                 className="relative w-full max-w-[420px] aspect-[4/5] overflow-hidden p-2.5 bg-[#2c1809]/20 border border-[var(--border-hover)]/30 shadow-2xl"
                 style={{
@@ -336,7 +344,7 @@ export default function AboutPage() {
                   />
                 </div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -350,7 +358,7 @@ export default function AboutPage() {
           borderBottom: "1px solid var(--border)",
         }}
       >
-        <div className="max-w-4xl mx-auto px-6 text-center space-y-12">
+        <Reveal className="max-w-4xl mx-auto px-6 text-center space-y-12">
           <div className="flex justify-center items-center gap-3">
             <div className="w-8 h-px bg-[var(--gold)]" />
             <p className="font-body text-[10px] tracking-[0.4em] uppercase text-[var(--gold)]">
@@ -376,7 +384,7 @@ export default function AboutPage() {
               To preserve heritage, celebrate craftsmanship, and bring timeless art into modern homes.
             </p>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* SECTION 8 — LOOKING AHEAD */}
@@ -387,7 +395,7 @@ export default function AboutPage() {
           borderBottom: "1px solid var(--border)",
         }}
       >
-        <div className="max-w-3xl mx-auto px-6 text-center space-y-6">
+        <Reveal className="max-w-3xl mx-auto px-6 text-center space-y-6">
           <div className="flex justify-center items-center gap-3">
             <div className="w-6 h-px bg-[var(--gold)]" />
             <p className="font-body text-[10px] tracking-[0.4em] uppercase text-[var(--gold)]">
@@ -408,7 +416,7 @@ export default function AboutPage() {
               From Prince Arts & Frames to Daddy Prince, our story is one of tradition, passion, and evolution. We invite you to become a part of that story.
             </p>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* FINAL SIGNATURE SECTION */}
@@ -418,7 +426,7 @@ export default function AboutPage() {
           borderBottom: "1px solid var(--border)",
         }}
       >
-        <div className="max-w-xl mx-auto px-6 space-y-8">
+        <Reveal className="max-w-xl mx-auto px-6 space-y-8">
           <p className="font-display text-6xl md:text-7xl font-light text-white tracking-[0.2em] uppercase mb-4 select-none">
             Daddy Prince
           </p>
@@ -428,7 +436,7 @@ export default function AboutPage() {
             <p>Curated with Passion.</p>
             <p>Crafted for Generations.</p>
           </div>
-        </div>
+        </Reveal>
       </section>
 
     </div>

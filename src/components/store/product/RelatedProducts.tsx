@@ -39,11 +39,12 @@ export default function RelatedProducts({ products }: { products: Product[] }) {
                 />
               </div>
               <div className="p-4">
-                <p className="font-body text-[9px] tracking-[0.2em] uppercase mb-1" style={{ color: "var(--gold)", opacity: 0.6 }}>
-                  {p.origin}
-                </p>
                 <h3 className="product-name font-display text-lg leading-tight mb-1">{p.name}</h3>
-                <p className="font-body text-[11px] mb-3" style={{ color: "var(--text-faint)" }}>{p.artist}</p>
+                {p.artist && !/unknown/i.test(p.artist) && (
+                  <p className="font-body text-[11px] mb-3" style={{ color: "var(--text-faint)" }}>
+                    by {p.artist}
+                  </p>
+                )}
                 <div className="flex items-center justify-between">
                   <p className="font-body text-sm font-medium" style={{ color: "var(--gold)" }}>
                     {formatPrice(p.price)}

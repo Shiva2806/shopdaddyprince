@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { openRazorpayCheckout } from "@/lib/razorpay/client";
 import { useSession } from "next-auth/react";
 import { useAuthModalStore } from "@/store/authModal";
+import { trackBeginCheckout } from "@/lib/analytics";
 
 type Step = "address" | "review" | "payment";
 
@@ -58,6 +59,12 @@ export default function CheckoutPage() {
       router.replace("/cart");
     }
   }, [status, openModal, router]);
+
+  useEffect(() => {
+    if (items && items.length > 0) {
+      trackBeginCheckout(items);
+    }
+  }, [items]);
 
   if (status === "loading") {
     return (

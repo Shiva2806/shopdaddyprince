@@ -6,6 +6,7 @@ import { formatPrice } from "@/utils/format";
 import { useCartStore } from "@/store/cart";
 import toast from "react-hot-toast";
 import type { Product, ProductVariant } from "@/types";
+import { trackAddToCart } from "@/lib/analytics";
 
 interface ProductData {
   id: string; slug: string; name: string; artist: string;
@@ -62,7 +63,6 @@ export default function ProductInfo({ product, variants = [] }: Props) {
         is_featured: false,
         tags: [],
         artist: product.artist,
-        origin: product.origin,
         created_at: "",
         updated_at: "",
       },
@@ -71,6 +71,7 @@ export default function ProductInfo({ product, variants = [] }: Props) {
       selectedVariant?.dimension,
       displayPrice
     );
+    trackAddToCart(product, qty, selectedVariant);
     toast.success(
       `${qty > 1 ? `${qty}× ` : ""}${product.name}${
         selectedVariant ? ` (${selectedVariant.dimension})` : ""
@@ -99,12 +100,11 @@ export default function ProductInfo({ product, variants = [] }: Props) {
       </h1>
 
       {/* Artist */}
-      <p className="font-body text-sm mb-1" style={{ color: "var(--text-muted)" }}>
-        by <span style={{ color: "var(--gold)" }}>{product.artist}</span>
-      </p>
-      <p className="font-body text-xs mb-8" style={{ color: "var(--text-faint)" }}>
-        {product.origin} · {product.year}
-      </p>
+      {product.artist && !/unknown/i.test(product.artist) && (
+        <p className="font-body text-sm mb-1" style={{ color: "var(--text-muted)" }}>
+          by <span style={{ color: "var(--gold)" }}>{product.artist}</span>
+        </p>
+      )}
 
       {/* Divider */}
       <div className="h-px mb-8" style={{ background: "linear-gradient(90deg, var(--border), transparent)" }} />
@@ -273,8 +273,6 @@ export default function ProductInfo({ product, variants = [] }: Props) {
         {[
           { label: "Medium", value: product.medium },
           { label: "Dimensions", value: product.dimensions },
-          { label: "Origin", value: product.origin },
-          { label: "Year", value: product.year },
         ].map(({ label, value }) => (
           <div key={label} className="flex gap-4">
             <span className="font-body text-[10px] tracking-[0.15em] uppercase w-24 shrink-0 pt-0.5" style={{ color: "var(--text-faint)" }}>

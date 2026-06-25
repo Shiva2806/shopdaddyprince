@@ -79,7 +79,6 @@ export async function POST(request: Request) {
     const {
       name,
       artist,
-      origin,
       price,
       compare_at_price,
       categories,
@@ -88,7 +87,6 @@ export async function POST(request: Request) {
       description,
       medium,
       dimensions: dimensionsText,
-      year,
       tags: tagsRaw,
       images,
       is_featured,
@@ -125,7 +123,6 @@ export async function POST(request: Request) {
     const dimensions = {
       text: dimensionsText || "",
       medium: medium || "",
-      year: year || "",
     };
 
     const { data: product, error: insertError } = await supabase
@@ -145,7 +142,6 @@ export async function POST(request: Request) {
         tags,
         dimensions,
         artist: artist || null,
-        origin: origin || null,
       })
       .select()
       .single();
@@ -163,7 +159,7 @@ export async function POST(request: Request) {
         sale_price: v.sale_price ? Math.round(parseFloat(v.sale_price) * 100) : null,
         stock: v.stock ? parseInt(v.stock) : 0,
         sku: v.sku || null,
-        weight_grams: v.weight_grams ? parseInt(v.weight_grams) : null
+        color: v.color || null,
       }));
 
       const { error: varErr } = await supabase

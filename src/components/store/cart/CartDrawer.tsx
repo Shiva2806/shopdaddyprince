@@ -148,9 +148,11 @@ export default function CartDrawer({ open, onClose }: Props) {
                         {p.name}
                       </h3>
                     </Link>
-                    <p className="font-body text-[10px] mb-1.5" style={{ color: "var(--text-faint)" }}>
-                      {p.artist} · {p.origin}
-                    </p>
+                    {p.artist && !/unknown/i.test(p.artist) && (
+                      <p className="font-body text-[10px] mb-1.5" style={{ color: "var(--text-faint)" }}>
+                        by {p.artist}
+                      </p>
+                    )}
                     {selectedDimension && (
                       <div className="mb-2">
                         <span className="inline-block font-body text-[9px] tracking-wider uppercase px-2 py-0.5"

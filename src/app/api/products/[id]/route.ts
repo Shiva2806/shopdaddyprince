@@ -46,7 +46,6 @@ export async function PATCH(
     // Assign incoming values directly (RUPEES -> PAISE conversions are done on the client)
     if (body.name !== undefined) updateData.name = body.name;
     if (body.artist !== undefined) updateData.artist = body.artist;
-    if (body.origin !== undefined) updateData.origin = body.origin;
     if (body.price !== undefined) updateData.price = body.price;
     if (body.compare_at_price !== undefined) updateData.compare_at_price = body.compare_at_price;
     if (body.categories !== undefined) updateData.categories = body.categories;
@@ -110,7 +109,7 @@ export async function PATCH(
           sale_price: parsePrice(v.sale_price),
           stock: v.stock ? parseInt(v.stock) : 0,
           sku: v.sku || null,
-          weight_grams: v.weight_grams ? parseInt(v.weight_grams) : null
+          color: v.color || null
         }));
         const { error: insErr } = await supabase
           .from("product_variants")
@@ -129,7 +128,7 @@ export async function PATCH(
             sale_price: parsePrice(v.sale_price),
             stock: v.stock ? parseInt(v.stock) : 0,
             sku: v.sku || null,
-            weight_grams: v.weight_grams ? parseInt(v.weight_grams) : null
+            color: v.color || null
           })
           .eq("id", v.id);
         if (updErr) {

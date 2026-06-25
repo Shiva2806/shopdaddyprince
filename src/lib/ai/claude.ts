@@ -149,30 +149,21 @@ export interface SeoGeneratorOutput {
 }
 
 export interface VisionAnalysisOutput {
-  detectedMetadata: {
-    productName: string;
-    category: string;
-    subcategory: string;
-    material: string;
-    style: string;
-    regionOfOrigin: string;
-    suggestedDimensions: string;
-    tags: string[];
-    keywords: string[];
-  };
-  narrative: {
-    productTitle: string;
-    shortDescription: string;
-    longDescription: string;
-    heritageStory: string;
-    keyHighlights: string[];
-  };
-  seo: {
-    seoTitle: string;
-    metaDescription: string;
-    keywords: string[];
-    slugSuggestions: string[];
-  };
+  productName: string;
+  description: string;
+  tags: string[];
+  category: string;
+  subcategory: string;
+  priceSuggestion?: string;
+  variants: {
+    dimension: string;
+    price: string;
+    sale_price?: string;
+    stock: string;
+    color?: string;
+    sku?: string;
+  }[];
+  isFeatured?: boolean;
 }
 
 /**
@@ -187,7 +178,6 @@ export async function generateProductDescription(
 - Subcategory: ${params.subcategory}
 - Material: ${params.material}
 - Dimensions: ${params.dimensions}
-- Region: ${params.region}
 ${params.price ? `- Price: ₹${params.price}` : ""}
 
 Return a valid JSON object matching the structure below. Return ONLY the raw JSON object. Do not include any explanations, preambles, or markdown wrappers.
@@ -266,7 +256,6 @@ export async function analyzeProductImage(
     dimensions?: string;
     material?: string;
     category?: string;
-    region?: string;
   }
 ): Promise<VisionAnalysisOutput> {
   return wrapAnthropicCall(async () => {
@@ -279,10 +268,9 @@ export async function analyzeProductImage(
       if (optionalParams.category) contextInstructions += `- Pre-entered Category: ${optionalParams.category}\n`;
       if (optionalParams.material) contextInstructions += `- Pre-entered Material: ${optionalParams.material}\n`;
       if (optionalParams.dimensions) contextInstructions += `- Pre-entered Dimensions: ${optionalParams.dimensions}\n`;
-      if (optionalParams.region) contextInstructions += `- Pre-entered Region: ${optionalParams.region}\n`;
     }
 
-    const systemPrompt = BRAND_SYSTEM_PROMPT + `\n\nYou are an expert in heritage Indian art, lost-wax bronze castings, traditional paintings, and antiques. Your task is to analyze the image of a heritage item and its price, identify key cultural details, and output a complete product detail package including detected metadata, narratives, and SEO configurations.`;
+    const systemPrompt = BRAND_SYSTEM_PROMPT + `\n\nYou are an expert in heritage Indian art, lost-wax bronze castings, traditional paintings, and antiques. Your task is to analyze the image of a heritage item and its price, identify key cultural details, and output a complete product detail package matching the required fields.`;
 
     const userPrompt = `Analyze the uploaded image of this heritage item.
 Price of the item is ₹${price}.
@@ -292,35 +280,23 @@ Please identify the item's details and generate a valid JSON object matching the
 
 JSON Structure:
 {
-  "detectedMetadata": {
-    "productName": "An elegant, premium product name reflecting the craft and object type (use the pre-entered name if helpful, otherwise generate a luxury title)",
-    "category": "Must be one of: paintings, home-decor, regional-arts, brass, vintage (select the best matching category)",
-    "subcategory": "Specific subcategory or craft genre (e.g. Lost-wax cast, Dhokra, Pichwai, Madhubani, Thanjavur Bronze, Wood Carving)",
-    "material": "Specific materials identified (use pre-entered materials if provided, otherwise estimate e.g. Lost-wax bronze, solid teak wood, mineral pigments on linen)",
-    "style": "The specific art style, school, or dynasty influence (e.g. Chola Style, Nathdwara School, Hoysala, Kangra Miniature)",
-    "regionOfOrigin": "The regional origin in India (e.g. Swamimalai, Tamil Nadu or Nathdwara, Rajasthan)",
-    "suggestedDimensions": "Suggested standard dimensions (e.g. 18 x 12 x 8 inches) if not pre-entered, or estimated from image visual context",
-    "tags": ["tag1", "tag2", "tag3"],
-    "keywords": ["keyword1", "keyword2", "keyword3"]
-  },
-  "narrative": {
-    "productTitle": "An evocative, editorial product title",
-    "shortDescription": "A refined, luxury short description (1-2 sentences).",
-    "longDescription": "Evocative, heritage-focused editorial content (2-3 paragraphs detailing the craft, craftsmanship, visual aesthetics, and placement).",
-    "heritageStory": "An editorial narrative detailing the history, mythological context, or cultural lineage of this art form and the lineage of the artisans.",
-    "keyHighlights": [
-      "Highlight 1: loss-wax/casting/craftsmanship complexity",
-      "Highlight 2: material/patina/pigment authenticity",
-      "Highlight 3: regional lineage/artistic history",
-      "Highlight 4: collectibility/home placement value"
-    ]
-  },
-  "seo": {
-    "seoTitle": "Premium brand-aligned SEO Title (under 60 chars) including 'Daddy Prince'.",
-    "metaDescription": "Captivating search meta description (under 160 chars).",
-    "keywords": ["seo-keyword1", "seo-keyword2", "seo-keyword3"],
-    "slugSuggestions": ["slug-option-1", "slug-option-2"]
-  }
+  "productName": "An elegant, premium product name reflecting the craft and object type (use the pre-entered name if helpful, otherwise generate a luxury title)",
+  "description": "Evocative, heritage-focused editorial description (2-3 paragraphs detailing the craft, craftsmanship, visual aesthetics, and placement).",
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7"],
+  "category": "Must be one of: paintings, home-decor, regional-arts, brass, vintage (select the best matching category)",
+  "subcategory": "Specific subcategory or craft genre (e.g. traditional screen arts, wall decor, kondapalli toys, cheriyal art, patachitra)",
+  "priceSuggestion": "Optional price recommendation in INR based on your analysis of quality/rarity, or just return the input price ${price}",
+  "variants": [
+    {
+      "dimension": "Size/Dimension of this variant (e.g. 12x16 inches or small, medium, large)",
+      "price": "Price in INR for this variant",
+      "sale_price": "Optional sale price in INR",
+      "stock": "Initial stock quantity (e.g. 1 or 2)",
+      "color": "Color option for this variant (e.g. Gold, Bronze, Red, Black)",
+      "sku": "Optional generated SKU"
+    }
+  ],
+  "isFeatured": true/false (Recommendation on whether this is a high-value showpiece suitable for featured banner display)
 }`;
 
     const modelName = "claude-sonnet-4-6";

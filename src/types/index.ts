@@ -50,9 +50,8 @@ export interface Product {
   is_featured: boolean;
   tags: string[];
   weight_grams?: number;
-  dimensions?: { text?: string; medium?: string; year?: string };
+  dimensions?: { text?: string; medium?: string };
   artist?: string;
-  origin?: string;
   created_at: string;
   updated_at: string;
 }
@@ -65,7 +64,7 @@ export interface ProductVariant {
   sale_price?: number;
   stock: number;
   sku?: string;
-  weight_grams?: number;
+  color?: string;
 }
 
 // ─── Cart ─────────────────────────────────────────────────────────────────────
@@ -136,4 +135,12 @@ export interface UserProfile {
 export interface ApiResponse<T> {
   data?: T;
   error?: string;
+}
+
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+    dataLayer?: any[];
+    clarity?: (...args: any[]) => void;
+  }
 }

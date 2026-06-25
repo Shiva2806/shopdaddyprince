@@ -739,18 +739,17 @@ export default function AccountClient({ session, initialProfile, initialOrders }
                             >
                               <Trash2 size={13} />
                             </button>
-                            <div className="absolute top-3 left-3 px-2 py-0.5 font-body text-[8px] tracking-widest uppercase bg-black/60 text-white rounded">
-                              {p.origin}
-                            </div>
                           </div>
                           <div className="p-4 flex-1 flex flex-col justify-between">
                             <div className="mb-4">
                               <h4 className="font-display text-lg font-semibold truncate" style={{ color: "var(--text)" }}>
                                 {p.name}
                               </h4>
-                              <p className="font-body text-[10px] mt-0.5" style={{ color: "var(--text-faint)" }}>
-                                Artist: {p.artist}
-                              </p>
+                              {p.artist && !/unknown/i.test(p.artist) && (
+                                <p className="font-body text-[10px] mt-0.5" style={{ color: "var(--text-faint)" }}>
+                                  by {p.artist}
+                                </p>
+                              )}
                             </div>
                             <div>
                               <p className="font-body text-base font-semibold mb-4" style={{ color: "var(--gold)" }}>

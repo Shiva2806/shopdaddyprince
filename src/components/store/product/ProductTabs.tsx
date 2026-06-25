@@ -50,22 +50,23 @@ export default function ProductTabs({ product }: { product: ProductData }) {
             {[
               { label: "Medium", value: product.medium },
               { label: "Dimensions", value: product.dimensions },
-              { label: "Year / Period", value: product.year },
-              { label: "Origin", value: product.origin },
-              { label: "Artist / Maker", value: product.artist },
+              product.artist && !/unknown/i.test(product.artist) ? { label: "Artist / Maker", value: product.artist } : null,
               { label: "Authenticity", value: "Certificate of authenticity included with every purchase" },
               { label: "Condition", value: "Excellent — inspected and approved by our curators" },
-            ].map(({ label, value }) => (
-              <div key={label} className="flex gap-6 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
-                <span
-                  className="font-body text-[10px] tracking-[0.2em] uppercase w-32 shrink-0 pt-0.5"
-                  style={{ color: "var(--text-faint)" }}
-                >
-                  {label}
-                </span>
-                <span className="font-body text-sm" style={{ color: "var(--text-muted)" }}>{value}</span>
-              </div>
-            ))}
+            ].filter(Boolean).map((item) => {
+              const { label, value } = item as { label: string; value: string };
+              return (
+                <div key={label} className="flex gap-6 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
+                  <span
+                    className="font-body text-[10px] tracking-[0.2em] uppercase w-32 shrink-0 pt-0.5"
+                    style={{ color: "var(--text-faint)" }}
+                  >
+                    {label}
+                  </span>
+                  <span className="font-body text-sm" style={{ color: "var(--text-muted)" }}>{value}</span>
+                </div>
+              );
+            })}
           </div>
         )}
 

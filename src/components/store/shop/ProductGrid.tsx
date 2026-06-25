@@ -6,6 +6,10 @@ import { ShoppingBag, ArrowUpRight } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import toast from "react-hot-toast";
 import type { Product } from "@/types";
+import Reveal from "@/components/ui/Reveal";
+
+
+import { trackAddToCart } from "@/lib/analytics";
 
 interface PlaceholderProduct {
   id: string; slug: string; name: string; artist: string;
@@ -44,10 +48,16 @@ export default function ProductGrid({ products }: { products: PlaceholderProduct
       is_featured: false,
       tags: [],
       artist: p.artist,
-      origin: p.origin,
       created_at: "",
       updated_at: "",
     } as any);
+    trackAddToCart({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      category: p.category,
+      artist: p.artist
+    }, 1);
     toast.success(`${p.name} added`);
   };
 
@@ -55,12 +65,11 @@ export default function ProductGrid({ products }: { products: PlaceholderProduct
     <>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
         {products.map((p, i) => (
-          <Link
-            key={p.id}
-            href={`/product/${p.slug}`}
-            className="product-shop-card group block glass-card overflow-hidden"
-            style={{ animationDelay: `${i * 0.05}s` }}
-          >
+          <Reveal key={p.id} delayMs={(i % 3) * 100}>
+            <Link
+              href={`/product/${p.slug}`}
+              className="product-shop-card group block glass-card overflow-hidden"
+            >
             {/* Image */}
             <div className="relative overflow-hidden aspect-[3/4]">
               {p.images && p.images.length >= 2 ? (
@@ -126,15 +135,14 @@ export default function ProductGrid({ products }: { products: PlaceholderProduct
 
             {/* Info */}
             <div className="p-3.5">
-              <p className="font-body text-[9px] tracking-[0.2em] uppercase mb-0.5" style={{ color: "var(--gold)", opacity: 0.6 }}>
-                {p.origin}
-              </p>
               <h3 className="product-shop-name font-display text-lg leading-tight">
                 {p.name}
               </h3>
-              <p className="font-body text-[10px] mt-0.5 mb-2.5" style={{ color: "var(--text-faint)" }}>
-                {p.artist}
-              </p>
+              {p.artist && !/unknown/i.test(p.artist) && (
+                <p className="font-body text-[10px] mt-0.5 mb-2.5" style={{ color: "var(--text-faint)" }}>
+                  by {p.artist}
+                </p>
+              )}
               <div className="flex items-center justify-between">
                 <p className="font-body text-sm font-medium" style={{ color: "var(--gold)" }}>
                   {formatPrice(p.price)}
@@ -146,7 +154,8 @@ export default function ProductGrid({ products }: { products: PlaceholderProduct
                 />
               </div>
             </div>
-          </Link>
+            </Link>
+          </Reveal>
         ))}
       </div>
     </>

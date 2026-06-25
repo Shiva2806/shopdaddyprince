@@ -102,7 +102,6 @@ const mobileSlides: HeroSlide[] = [
 
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 interface ParallaxImageWrapperProps {
   image: string;
@@ -121,37 +120,12 @@ function ParallaxImageWrapper({
   image,
   tag,
   isActive,
-  isStoreSlide,
-  isMobile,
-  prefersReducedMotion,
-  lowPerformance,
   imageFilter,
   objectPosition,
   priority,
 }: ParallaxImageWrapperProps) {
-  const { scrollY } = useScroll();
-
-  let factor = isStoreSlide ? 0.22 : 0.12;
-  if (isMobile) {
-    factor *= 0.4;
-  }
-  if (prefersReducedMotion || lowPerformance) {
-    factor = 0;
-  }
-
-  const rawY = useTransform(scrollY, [0, 800], [0, 800 * factor]);
-  const springY = useSpring(rawY, {
-    stiffness: 100,
-    damping: 25,
-    mass: 0.5,
-    restDelta: 0.001,
-  });
-
   return (
-    <motion.div
-      className="absolute inset-x-0 -inset-y-16 h-[calc(100%+128px)]"
-      style={{ y: springY }}
-    >
+    <div className="absolute inset-0">
       <Image
         src={image}
         alt={tag}
@@ -167,7 +141,7 @@ function ParallaxImageWrapper({
           objectPosition: objectPosition || "center",
         }}
       />
-    </motion.div>
+    </div>
   );
 }
 
@@ -182,34 +156,12 @@ interface ParallaxContentWrapperProps {
 
 function ParallaxContentWrapper({
   children,
-  isStoreSlide,
-  isMobile,
-  prefersReducedMotion,
-  lowPerformance,
   className = "",
 }: ParallaxContentWrapperProps) {
-  const { scrollY } = useScroll();
-
-  let contentFactor = isStoreSlide ? 0.08 : 0.03;
-  if (isMobile) {
-    contentFactor *= 0.4;
-  }
-  if (prefersReducedMotion || lowPerformance) {
-    contentFactor = 0;
-  }
-
-  const rawY = useTransform(scrollY, [0, 800], [0, 800 * -contentFactor]);
-  const springY = useSpring(rawY, {
-    stiffness: 100,
-    damping: 25,
-    mass: 0.5,
-    restDelta: 0.001,
-  });
-
   return (
-    <motion.div style={{ y: springY }} className={className}>
+    <div className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -221,6 +173,47 @@ export default function Hero() {
 
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [lowPerformance, setLowPerformance] = useState(false);
+
+  // Swipe gesture refs
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const touchEndY = useRef<number | null>(null);
+  const touchStartTime = useRef<number>(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    touchStartTime.current = Date.now();
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+    touchEndY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current || !touchStartY.current || !touchEndY.current) return;
+
+    const diffX = touchStartX.current - touchEndX.current;
+    const diffY = touchStartY.current - touchEndY.current;
+    const duration = Date.now() - touchStartTime.current;
+
+    // Minimum swipe distance threshold (50px), direction validation (horizontal movement must exceed vertical movement) and timeout limit
+    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY) && duration < 500) {
+      if (diffX > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+
+    // Reset coordinates
+    touchStartX.current = null;
+    touchEndX.current = null;
+    touchStartY.current = null;
+    touchEndY.current = null;
+  };
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -299,6 +292,9 @@ export default function Hero() {
       data-theme="dark"
       className="relative h-[100dvh] min-h-[680px] w-full flex items-end pb-28 md:items-center md:pb-0 overflow-hidden" 
       style={{ background: "var(--bg-hero)" }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {slides.map((s, idx) => {
         const isActive = idx === current;

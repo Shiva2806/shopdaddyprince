@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { CATEGORIES, type ProductCategory } from "@/types";
@@ -9,6 +9,7 @@ import ProductGrid from "./ProductGrid";
 import { SlidersHorizontal, X } from "lucide-react";
 import { getCollectionDetail } from "@/utils/collectionContent";
 import EmptyCollectionState from "./EmptyCollectionState";
+import { trackViewItemList } from "@/lib/analytics";
 
 interface UIProduct {
   id: string;
@@ -69,6 +70,12 @@ export default function ShopClient({
     if (activeSort === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
     return list;
   }, [initialProducts, activeSub, activeState, activeTag, activeSort]);
+
+  useEffect(() => {
+    if (products && products.length > 0) {
+      trackViewItemList(products, `${category} Category List`);
+    }
+  }, [products, category]);
 
   const setParam = (key: string, value: string | null) => {
     const params = new URLSearchParams(window.location.search);

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ImageGallery from "./ImageGallery";
 import ProductInfo from "./ProductInfo";
 import ProductTabs from "./ProductTabs";
 import RelatedProducts from "./RelatedProducts";
+import { trackViewItem, trackViewItemList } from "@/lib/analytics";
 
 import type { ProductVariant } from "@/types";
 
@@ -24,6 +25,13 @@ interface Props {
 
 export default function ProductClient({ product, related, variants = [] }: Props) {
   const [activeImage, setActiveImage] = useState(0);
+
+  useEffect(() => {
+    trackViewItem(product);
+    if (related && related.length > 0) {
+      trackViewItemList(related, "Related Products");
+    }
+  }, [product, related]);
 
   return (
     <div className="min-h-screen pt-20" style={{ backgroundColor: "var(--bg)" }}>

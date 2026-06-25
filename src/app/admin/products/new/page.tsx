@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, Sparkles, ArrowLeft, X, Loader2 } from "lucide-react";
 import { CATEGORIES } from "@/types";
@@ -15,9 +15,9 @@ export default function NewProduct() {
   const [images, setImages] = useState<string[]>([]);
   const [uploadingFiles, setUploadingFiles] = useState<Record<string, number>>({});
   const [form, setForm] = useState({
-    name: "", artist: "", origin: "", price: "", compare_at_price: "",
+    name: "", artist: "", price: "", compare_at_price: "",
     subcategory: "", stock: "", description: "", medium: "",
-    dimensions: "", year: "", tags: "", status: "active",
+    dimensions: "", tags: "", status: "active",
   });
   const [categories, setCategories] = useState<string[]>(["paintings"]);
   const [isFeatured, setIsFeatured] = useState(false);
@@ -26,6 +26,47 @@ export default function NewProduct() {
   const supabase = createClient() as any;
 
   const set = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
+
+  // Load from AI Draft in localStorage if available
+  useEffect(() => {
+    const rawDraft = localStorage.getItem("ai_draft_product");
+    if (rawDraft) {
+      try {
+        const draft = JSON.parse(rawDraft);
+        setForm((f) => ({
+          ...f,
+          name: draft.name || "",
+          description: draft.description || "",
+          tags: draft.tags || "",
+          subcategory: draft.subcategory || "",
+          price: draft.price ? draft.price.toString() : "",
+        }));
+        if (draft.category) {
+          setCategories([draft.category]);
+        }
+        if (draft.images) {
+          setImages(draft.images);
+        }
+        if (draft.variants) {
+          setVariants(draft.variants.map((v: any) => ({
+            dimension: v.dimension || "",
+            price: v.price ? v.price.toString() : "",
+            sale_price: v.sale_price ? v.sale_price.toString() : "",
+            stock: v.stock ? v.stock.toString() : "1",
+            sku: v.sku || "",
+            color: v.color || "",
+          })));
+        }
+        if (draft.isFeatured !== undefined) {
+          setIsFeatured(draft.isFeatured);
+        }
+        localStorage.removeItem("ai_draft_product");
+        toast.success("AI draft details loaded!");
+      } catch (err) {
+        console.error("Failed to parse AI draft product from localStorage", err);
+      }
+    }
+  }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -118,7 +159,13 @@ export default function NewProduct() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: `Write a rich product description for: "${form.name}" — a ${form.subcategory || categories.join("/")} piece by ${form.artist || "an Indian artisan"} from ${form.origin || "India"}. Medium: ${form.medium || "unspecified"}. Year: ${form.year || "contemporary"}. Return only the description paragraph, no preamble.`,
+          message: `Generate details for: "${form.name}" — a ${form.subcategory || categories.join("/")} piece by ${form.artist || "an Indian artisan"}. Medium: ${form.medium || "unspecified"}.
+          Please return a JSON object with:
+          {
+            "description": "A rich product description (1-2 paragraphs detailing the story and craftsmanship)",
+            "tags": ["comma", "separated", "list", "of", "relevant", "tags", "for", "this", "product"]
+          }
+          Return ONLY this raw JSON object. Do not include markdown code block syntax.`,
           history: [],
         }),
       });
@@ -131,11 +178,27 @@ export default function NewProduct() {
       }
 
       if (!res.ok || data.error) {
-        throw new Error(data.error || "Failed to generate AI description");
+        throw new Error(data.error || "Failed to generate AI details");
       }
 
-      set("description", data.reply);
-      toast.success("AI description generated");
+      let replyText = data.reply.trim();
+      if (replyText.startsWith("```")) {
+        replyText = replyText.replace(/^```(json)?/i, "").replace(/```$/, "").trim();
+      }
+
+      try {
+        const parsed = JSON.parse(replyText);
+        if (parsed.description) set("description", parsed.description);
+        if (parsed.tags) {
+          const tagsStr = Array.isArray(parsed.tags) ? parsed.tags.join(", ") : parsed.tags;
+          set("tags", tagsStr);
+        }
+        toast.success("AI description and tags generated");
+      } catch (e) {
+        // Fallback: if not valid JSON, set description to the reply
+        set("description", data.reply);
+        toast.success("AI description generated");
+      }
     } catch (err: any) {
       toast.error(err.message || "AI generation failed");
     }
@@ -235,16 +298,8 @@ export default function NewProduct() {
                     <input value={form.artist} onChange={(e) => set("artist", e.target.value)} placeholder="Artist name" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
                   </div>
                   <div>
-                    {label("Origin")}
-                    <input value={form.origin} onChange={(e) => set("origin", e.target.value)} placeholder="e.g. Jaipur, Rajasthan" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
-                  </div>
-                  <div>
                     {label("Medium")}
                     <input value={form.medium} onChange={(e) => set("medium", e.target.value)} placeholder="e.g. Oil on canvas" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
-                  </div>
-                  <div>
-                    {label("Year / Period")}
-                    <input value={form.year} onChange={(e) => set("year", e.target.value)} placeholder="e.g. Circa 1980s" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
                   </div>
                   <div className="col-span-2">
                     {label("Dimensions")}
@@ -350,7 +405,7 @@ export default function NewProduct() {
                   <button
                     type="button"
                     onClick={() => {
-                      setVariants([...variants, { dimension: "", price: "", sale_price: "", stock: "1", sku: "", weight_grams: "" }]);
+                      setVariants([...variants, { dimension: "", price: "", sale_price: "", stock: "1", sku: "", color: "" }]);
                     }}
                     className="flex items-center gap-2 px-4 py-2 font-body text-xs tracking-widest uppercase transition-all"
                     style={{ border: "1px solid var(--border)", color: "var(--gold)", backgroundColor: "var(--gold-glow)" }}
@@ -484,7 +539,7 @@ export default function NewProduct() {
                             />
                           </div>
                           <div>
-                            {label("SKU / Weight (g)")}
+                            {label("SKU / Color")}
                             <div className="flex gap-1">
                               <input
                                 value={v.sku}
@@ -500,14 +555,13 @@ export default function NewProduct() {
                                 onBlur={onBlur}
                               />
                               <input
-                                type="number"
-                                value={v.weight_grams}
+                                value={v.color || ""}
                                 onChange={(e) => {
                                   const list = [...variants];
-                                  list[idx].weight_grams = e.target.value;
+                                  list[idx].color = e.target.value;
                                   setVariants(list);
                                 }}
-                                placeholder="grams"
+                                placeholder="Color"
                                 className={inputClass}
                                 style={{ ...inputStyle, minWidth: "0" }}
                                 onFocus={onFocus}

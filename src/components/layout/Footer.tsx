@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Reveal from "@/components/ui/Reveal";
 
 export default function Footer() {
   return (
@@ -23,7 +24,7 @@ export default function Footer() {
       />
 
       {/* Footer Content */}
-      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 w-full flex-1 flex flex-col justify-between">
+      <Reveal className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 w-full flex-1 flex flex-col justify-between">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-10 pb-12 border-b" style={{ borderColor: "rgba(199, 154, 59, 0.1)" }}>
 
           {/* Brand Column (Left) */}
@@ -210,7 +211,7 @@ export default function Footer() {
             <Link href="/terms-and-conditions" className="hover:text-[#C79A3B] transition-colors">Terms & Conditions</Link>
           </div>
         </div>
-      </div>
+      </Reveal>
     </footer>
   );
 }

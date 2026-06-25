@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import Reveal from "@/components/ui/Reveal";
+
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
@@ -49,7 +51,7 @@ export default function Newsletter() {
         background: "radial-gradient(ellipse 60% 70% at 50% 100%, rgba(201,168,76,0.06) 0%, transparent 65%)"
       }} />
 
-      <div className="relative z-10 max-w-xl mx-auto px-6 text-center">
+      <Reveal className="relative z-10 max-w-xl mx-auto px-6 text-center">
         <div className="flex items-center justify-center gap-4 mb-4">
           <div className="w-6 h-px" style={{ backgroundColor: "var(--gold)" }} />
           <p className="font-body text-[10px] tracking-[0.4em] uppercase" style={{ color: "var(--gold)" }}>
@@ -108,7 +110,7 @@ export default function Newsletter() {
         <p className="font-body text-[10px] mt-4 tracking-wide" style={{ color: "var(--text-muted)" }}>
           No spam. Only meaningful arrivals.
         </p>
-      </div>
+      </Reveal>
     </section>
   );
 }

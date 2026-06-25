@@ -21,6 +21,9 @@ export default function CookieConsent() {
 
   const handleAccept = () => {
     localStorage.setItem("dp-cookie-consent", "accepted");
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("cookie-consent-updated"));
+    }
     setShowBanner(false);
     toast.success("Thank you for accepting our cookies!", {
       duration: 3000,
@@ -30,6 +33,9 @@ export default function CookieConsent() {
 
   const handleManage = () => {
     localStorage.setItem("dp-cookie-consent", "accepted");
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("cookie-consent-updated"));
+    }
     setShowBanner(false);
     toast.success("Essential preferences saved successfully.", {
       duration: 3000,

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import Reveal from "@/components/ui/Reveal";
 
 const categories = [
   {
@@ -78,29 +78,41 @@ export default function FeaturedCategories() {
         {/* Mobile layout - stack paintings hero on top, 2-column grid for others */}
         <div className="flex flex-col gap-5 md:hidden">
           {/* Paintings — Hero Banner */}
-          <CategoryCard cat={categories[0]} className="w-full aspect-[16/10]" />
+          <Reveal>
+            <CategoryCard cat={categories[0]} className="w-full aspect-[16/10]" />
+          </Reveal>
           
           {/* Remaining 4 categories in a clean 2-column grid */}
           <div className="grid grid-cols-2 gap-4">
-            <CategoryCard cat={categories[1]} className="aspect-square" />
-            <CategoryCard cat={categories[3]} className="aspect-square" />
-            <CategoryCard cat={categories[2]} className="aspect-square" />
-            <CategoryCard cat={categories[4]} className="aspect-square" />
+            <Reveal delayMs={0}><CategoryCard cat={categories[1]} className="aspect-square" /></Reveal>
+            <Reveal delayMs={100}><CategoryCard cat={categories[3]} className="aspect-square" /></Reveal>
+            <Reveal delayMs={200}><CategoryCard cat={categories[2]} className="aspect-square" /></Reveal>
+            <Reveal delayMs={300}><CategoryCard cat={categories[4]} className="aspect-square" /></Reveal>
           </div>
         </div>
 
         {/* Bento grid layout for Desktop */}
         <div className="hidden md:grid grid-cols-12 grid-rows-2 gap-5 h-[640px]">
           {/* Paintings — large left */}
-          <CategoryCard cat={categories[0]} className="col-span-5 row-span-2" />
+          <Reveal className="col-span-5 row-span-2" delayMs={0}>
+            <CategoryCard cat={categories[0]} className="w-full h-full" />
+          </Reveal>
           {/* Home Decor — top middle */}
-          <CategoryCard cat={categories[1]} className="col-span-4 row-span-1" />
+          <Reveal className="col-span-4 row-span-1" delayMs={100}>
+            <CategoryCard cat={categories[1]} className="w-full h-full" />
+          </Reveal>
           {/* Brass — top right */}
-          <CategoryCard cat={categories[3]} className="col-span-3 row-span-1" />
+          <Reveal className="col-span-3 row-span-1" delayMs={200}>
+            <CategoryCard cat={categories[3]} className="w-full h-full" />
+          </Reveal>
           {/* Regional — bottom middle */}
-          <CategoryCard cat={categories[2]} className="col-span-3 row-span-1" />
+          <Reveal className="col-span-3 row-span-1" delayMs={300}>
+            <CategoryCard cat={categories[2]} className="w-full h-full" />
+          </Reveal>
           {/* Vintage — bottom right wide */}
-          <CategoryCard cat={categories[4]} className="col-span-4 row-span-1" />
+          <Reveal className="col-span-4 row-span-1" delayMs={400}>
+            <CategoryCard cat={categories[4]} className="w-full h-full" />
+          </Reveal>
         </div>
       </div>
     </section>
@@ -114,56 +126,14 @@ function CategoryCard({
   cat: (typeof categories)[0];
   className?: string;
 }) {
-  const cardRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ["start end", "end start"],
-  });
-
-  const [isMobile, setIsMobile] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [lowPerformance, setLowPerformance] = useState(false);
-
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
-    
-    const memory = (navigator as any).deviceMemory;
-    const cores = navigator.hardwareConcurrency;
-    const isLow = (memory && memory < 4) || (cores && cores < 4);
-    setLowPerformance(isLow);
-
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const rawY = useTransform(scrollYProgress, [0, 1], [-15, 15]);
-  const rawScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.1]);
-
-  const yVal = useTransform(rawY, (v) => {
-    if (prefersReducedMotion || lowPerformance) return 0;
-    return isMobile ? v * 0.35 : v;
-  });
-
-  const scaleVal = useTransform(rawScale, (v) => {
-    if (prefersReducedMotion || lowPerformance) return 1.0;
-    return isMobile ? 1.0 + (v - 1.0) * 0.35 : v;
-  });
-
-  const y = useSpring(yVal, { stiffness: 100, damping: 25, mass: 0.5 });
-  const scale = useSpring(scaleVal, { stiffness: 100, damping: 25, mass: 0.5 });
-
   return (
     <Link
-      ref={cardRef}
       href={`/shop/${cat.slug}`}
       className={`group category-card relative overflow-hidden block ${className}`}
     >
       {/* Image */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
-        <motion.div style={{ y, scale }} className="w-full h-full relative">
+        <div className="w-full h-full relative">
           <Image
             src={cat.image}
             alt={cat.label}
@@ -171,7 +141,7 @@ function CategoryCard({
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
           />
-        </motion.div>
+        </div>
       </div>
 
       {/* Strong dark gradient overlay for text readability */}

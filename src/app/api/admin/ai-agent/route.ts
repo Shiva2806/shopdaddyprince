@@ -158,38 +158,26 @@ export async function POST(request: Request) {
     } 
     
     if (type === "test") {
-      // Simulated integration response matching the vision JSON output schema
+      // Simulated integration response matching the simplified vision JSON output schema
       return NextResponse.json({
         data: {
-          detectedMetadata: {
-            productName: "Kalamkari Ramayana Painting",
-            category: "paintings",
-            subcategory: "kalamkari",
-            material: "Natural mineral pigments on hand-woven cotton canvas",
-            style: "Srikalahasti School of Kalamkari",
-            regionOfOrigin: "Srikalahasti, Andhra Pradesh",
-            suggestedDimensions: "36 x 24 inches",
-            tags: ["kalamkari", "ramayana", "paintings", "mythology", "heritage"],
-            keywords: ["kalamkari ramayana painting", "traditional indian art", "mythological paintings"]
-          },
-          narrative: {
-            productTitle: "Handpainted Kalamkari Ramayana Heritage Canvas",
-            shortDescription: "An extraordinary hand-painted Kalamkari canvas depicting epic narratives from the Ramayana in organic mineral pigments.",
-            longDescription: "Crafted on hand-loomed cotton, this museum-grade Kalamkari painting depicts scenes from the sacred Ramayana epic. Each detail is painstakingly drawn with a bamboo pen (kalam) using traditional vegetable dyes and mineral extracts. The earthy color palette of deep indigo, madder red, and mustard yellow is typical of classical Temple hangings, giving it an authentic vintage allure.\n\nThe Srikalahasti style relies on fine outline drawing followed by manual coloring. This makes each depiction of deities and elements completely unique. Suitable as a primary focal work in fine residences and heritage spaces.",
-            heritageStory: "Kalamkari, meaning 'pen-craftsmanship,' has its roots in the medieval temples of Andhra Pradesh. Srikalahasti remains the heart of this ancient lineage, preserving natural organic dyeing processes that require up to twenty-three steps of washing, treating, drawing, and boiling.",
-            keyHighlights: [
-              "Hand-drawn using traditional bamboo pen (kalam)",
-              "100% natural organic vegetable dyes and mineral pigments",
-              "Srikalahasti temple-hanging lineage style",
-              "Depicts central scenes from the Ramayana epic"
-            ]
-          },
-          seo: {
-            seoTitle: "Kalamkari Ramayana Painting | Indian Heritage Art | Daddy Prince",
-            metaDescription: "Discover museum-grade Srikalahasti Kalamkari Ramayana paintings at Daddy Prince. Hand-painted with natural dyes on cotton canvas for fine art collectors.",
-            keywords: ["kalamkari ramayana painting", "srikalahasti kalamkari", "indian heritage art paintings", "daddy prince gallery"],
-            slugSuggestions: ["kalamkari-ramayana-painting-srikalahasti", "handpainted-ramayana-kalamkari"]
-          }
+          productName: "Kalamkari Ramayana Painting",
+          description: "Crafted on hand-loomed cotton, this museum-grade Kalamkari painting depicts scenes from the sacred Ramayana epic. Each detail is painstakingly drawn with a bamboo pen (kalam) using traditional vegetable dyes and mineral extracts. The Srikalahasti style relies on fine outline drawing followed by manual coloring. This makes each depiction of deities and elements completely unique. Suitable as a primary focal work in fine residences and heritage spaces.",
+          tags: ["kalamkari painting", "gold foil", "hindu art", "traditional indian art", "heritage decor"],
+          category: "paintings",
+          subcategory: "traditional screen arts",
+          priceSuggestion: "48500",
+          variants: [
+            {
+              dimension: "24 x 18 inches",
+              price: "48500",
+              sale_price: "45000",
+              stock: "1",
+              color: "Multicolor",
+              sku: "KAL-RAM-2418"
+            }
+          ],
+          isFeatured: true
         }
       });
     }

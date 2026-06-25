@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import CookieConsent from "@/components/layout/CookieConsent";
 import WelcomePopup from "@/components/layout/WelcomePopup";
 import LoginModal from "@/components/auth/LoginModal";
+import AnalyticsProvider from "@/components/layout/AnalyticsProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://shopdaddyprince.com"),
@@ -71,6 +72,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <AuthProvider>
+            <AnalyticsProvider />
             {children}
             <CookieConsent />
             <WelcomePopup />

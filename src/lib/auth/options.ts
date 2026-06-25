@@ -89,7 +89,8 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: dummyEmail,
           name: `Patron ${phone}`,
-        };
+          isNewUser: !existingProfile,
+        } as any;
       },
     }),
   ],
@@ -117,6 +118,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (!existing) {
+          (user as any).isNewUser = true;
           // Create new profile for first-time login
           const { error: insertError } = await supabase
             .from("profiles")
@@ -157,6 +159,7 @@ export const authOptions: NextAuthOptions = {
             console.error(`[WELCOME EMAIL FAILED] Recipient: ${user.email!}, Exception:`, emailErr);
           }
         } else {
+          (user as any).isNewUser = false;
           // Update name and avatar if they changed on Google side
           const { error: updateError } = await supabase
             .from("profiles")
@@ -176,12 +179,14 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
+        (session.user as any).isNewUser = token.isNewUser;
       }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
+        token.isNewUser = (user as any).isNewUser;
       }
       return token;
     },

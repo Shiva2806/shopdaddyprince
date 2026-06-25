@@ -23,9 +23,9 @@ export default function EditProduct({ params }: Props) {
   const [isFeatured, setIsFeatured] = useState(false);
   const [variants, setVariants] = useState<any[]>([]);
   const [form, setForm] = useState({
-    name: "", artist: "", origin: "", price: "", compare_at_price: "",
+    name: "", artist: "", price: "", compare_at_price: "",
     subcategory: "", stock: "", description: "", medium: "",
-    dimensions: "", year: "", tags: "", status: "active",
+    dimensions: "", tags: "", status: "active",
   });
 
   const supabase = createClient() as any;
@@ -51,7 +51,6 @@ export default function EditProduct({ params }: Props) {
       setForm({
         name: data.name || "",
         artist: data.artist || "",
-        origin: data.origin || "",
         price: data.price ? (data.price / 100).toString() : "",
         compare_at_price: data.compare_at_price ? (data.compare_at_price / 100).toString() : "",
         subcategory: data.subcategory || "",
@@ -59,7 +58,6 @@ export default function EditProduct({ params }: Props) {
         description: data.description || "",
         medium: data.dimensions?.medium || "",
         dimensions: data.dimensions?.text || "",
-        year: data.dimensions?.year || "",
         tags: data.tags ? data.tags.join(", ") : "",
         status: data.status || "active",
       });
@@ -82,7 +80,7 @@ export default function EditProduct({ params }: Props) {
         sale_price: v.sale_price ? (v.sale_price / 100).toString() : "",
         stock: v.stock ? v.stock.toString() : "0",
         sku: v.sku || "",
-        weight_grams: v.weight_grams ? v.weight_grams.toString() : ""
+        color: v.color || ""
       })) : []);
     } catch (err: any) {
       toast.error(err.message || "Failed to load product details");
@@ -185,7 +183,13 @@ export default function EditProduct({ params }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: `Write a rich product description for: "${form.name}" — a ${form.subcategory || categories.join("/")} piece by ${form.artist || "an Indian artisan"} from ${form.origin || "India"}. Medium: ${form.medium || "unspecified"}. Year: ${form.year || "contemporary"}. Return only the description paragraph, no preamble.`,
+          message: `Generate details for: "${form.name}" — a ${form.subcategory || categories.join("/")} piece by ${form.artist || "an Indian artisan"}. Medium: ${form.medium || "unspecified"}.
+          Please return a JSON object with:
+          {
+            "description": "A rich product description (1-2 paragraphs detailing the story and craftsmanship)",
+            "tags": ["comma", "separated", "list", "of", "relevant", "tags", "for", "this", "product"]
+          }
+          Return ONLY this raw JSON object. Do not include markdown code block syntax.`,
           history: [],
         }),
       });
@@ -198,11 +202,27 @@ export default function EditProduct({ params }: Props) {
       }
 
       if (!res.ok || data.error) {
-        throw new Error(data.error || "Failed to generate AI description");
+        throw new Error(data.error || "Failed to generate AI details");
       }
 
-      set("description", data.reply);
-      toast.success("AI description generated");
+      let replyText = data.reply.trim();
+      if (replyText.startsWith("```")) {
+        replyText = replyText.replace(/^```(json)?/i, "").replace(/```$/, "").trim();
+      }
+
+      try {
+        const parsed = JSON.parse(replyText);
+        if (parsed.description) set("description", parsed.description);
+        if (parsed.tags) {
+          const tagsStr = Array.isArray(parsed.tags) ? parsed.tags.join(", ") : parsed.tags;
+          set("tags", tagsStr);
+        }
+        toast.success("AI description and tags generated");
+      } catch (e) {
+        // Fallback: if not valid JSON, set description to the reply
+        set("description", data.reply);
+        toast.success("AI description generated");
+      }
     } catch (err: any) {
       toast.error(err.message || "AI generation failed");
     }
@@ -232,7 +252,6 @@ export default function EditProduct({ params }: Props) {
       const dimensions = {
         text: form.dimensions || "",
         medium: form.medium || "",
-        year: form.year || "",
       };
 
       const res = await fetch(`/api/products/${params.id}`, {
@@ -241,7 +260,6 @@ export default function EditProduct({ params }: Props) {
         body: JSON.stringify({
           name: form.name,
           artist: form.artist || null,
-          origin: form.origin || null,
           price: pricePaise,
           compare_at_price: compareAtPricePaise,
           categories,
@@ -338,16 +356,8 @@ export default function EditProduct({ params }: Props) {
                     <input value={form.artist} onChange={(e) => set("artist", e.target.value)} placeholder="Artist name" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
                   </div>
                   <div>
-                    {label("Origin")}
-                    <input value={form.origin} onChange={(e) => set("origin", e.target.value)} placeholder="e.g. Jaipur, Rajasthan" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
-                  </div>
-                  <div>
                     {label("Medium")}
                     <input value={form.medium} onChange={(e) => set("medium", e.target.value)} placeholder="e.g. Oil on canvas" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
-                  </div>
-                  <div>
-                    {label("Year / Period")}
-                    <input value={form.year} onChange={(e) => set("year", e.target.value)} placeholder="e.g. Circa 1980s" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
                   </div>
                   <div className="col-span-2">
                     {label("Dimensions")}
@@ -453,7 +463,7 @@ export default function EditProduct({ params }: Props) {
                   <button
                     type="button"
                     onClick={() => {
-                      setVariants([...variants, { dimension: "", price: "", sale_price: "", stock: "1", sku: "", weight_grams: "" }]);
+                      setVariants([...variants, { dimension: "", price: "", sale_price: "", stock: "1", sku: "", color: "" }]);
                     }}
                     className="flex items-center gap-2 px-4 py-2 font-body text-xs tracking-widest uppercase transition-all"
                     style={{ border: "1px solid var(--border)", color: "var(--gold)", backgroundColor: "var(--gold-glow)" }}
@@ -587,7 +597,7 @@ export default function EditProduct({ params }: Props) {
                             />
                           </div>
                           <div>
-                            {label("SKU / Weight (g)")}
+                            {label("SKU / Color")}
                             <div className="flex gap-1">
                               <input
                                 value={v.sku}
@@ -603,14 +613,13 @@ export default function EditProduct({ params }: Props) {
                                 onBlur={onBlur}
                               />
                               <input
-                                type="number"
-                                value={v.weight_grams}
+                                value={v.color || ""}
                                 onChange={(e) => {
                                   const list = [...variants];
-                                  list[idx].weight_grams = e.target.value;
+                                  list[idx].color = e.target.value;
                                   setVariants(list);
                                 }}
-                                placeholder="grams"
+                                placeholder="Color"
                                 className={inputClass}
                                 style={{ ...inputStyle, minWidth: "0" }}
                                 onFocus={onFocus}

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Check, ShoppingBag, ArrowRight, MapPin, CreditCard } from "lucide-react";
 import { formatPrice, formatOrderId } from "@/utils/format";
+import OrderTracker from "@/components/store/checkout/OrderTracker";
 
 export const metadata = {
   title: "Acquisition Confirmed | Daddy Prince",
@@ -48,6 +49,7 @@ export default async function SuccessPage({
 
   return (
     <div className="min-h-screen pt-24 pb-16 flex items-center justify-center" style={{ backgroundColor: "var(--bg)" }}>
+      <OrderTracker order={order} />
       <div className="max-w-2xl w-full mx-6 glass-card p-8 sm:p-12 text-center relative overflow-hidden animate-fade-up">
         {/* Subtle decorative background element */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px]" style={{ background: "linear-gradient(90deg, transparent, var(--gold), transparent)" }} />
